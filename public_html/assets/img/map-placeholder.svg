@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480" role="img" aria-label="No preview available">
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0v32" fill="none" stroke="#28323d" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="480" height="480" fill="#131a21"/>
+  <rect width="480" height="480" fill="url(#grid)"/>
+  <g fill="none" stroke="#3a4857" stroke-width="3">
+    <path d="M110 340 200 200l70 90 50-70 60 120z"/>
+  </g>
+  <circle cx="150" cy="150" r="9" fill="#f2a413"/>
+  <circle cx="340" cy="330" r="9" fill="#d4402f"/>
+  <text x="240" y="430" text-anchor="middle" fill="#8e9dad"
+        font-family="system-ui, sans-serif" font-size="20">No preview yet</text>
+</svg>

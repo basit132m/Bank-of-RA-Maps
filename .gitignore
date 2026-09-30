@@ -1,0 +1,28 @@
+# Local configuration — never commit credentials
+config/config.php
+
+# Runtime data
+storage/cache/*
+storage/logs/*
+!storage/cache/.gitkeep
+!storage/logs/.gitkeep
+
+# Local SQLite development database
+database/*.sqlite
+database/*.sqlite-journal
+
+# Uploaded content (map files and images live on the host, not in git)
+# Map files are stored outside the web root and served only via /download/*
+storage/maps/*
+!storage/maps/.gitkeep
+public_html/uploads/previews/*
+!public_html/uploads/previews/.gitkeep
+
+# Dependencies / editors / OS
+vendor/
+node_modules/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp

@@ -1,0 +1,11 @@
+# Uploaded images only. Never execute anything in this tree.
+Options -Indexes -ExecCGI
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+
+# Serve only image types; deny everything else outright.
+<FilesMatch "\.(?i:php|phtml|php[0-9]|phar|pl|py|cgi|sh|htaccess)$">
+    Require all denied
+</FilesMatch>
