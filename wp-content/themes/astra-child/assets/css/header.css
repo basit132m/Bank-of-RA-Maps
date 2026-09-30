@@ -1,0 +1,603 @@
+/* ==========================================================================
+   Bank of YR Maps — site header
+   Namespaced under .byrm-header so nothing here collides with Astra.
+   ========================================================================== */
+
+/* ------------------------------------------------------------- webfont ---- */
+
+@font-face {
+  font-family: "Chakra Petch";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/chakra-petch-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Chakra Petch";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/chakra-petch-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Chakra Petch";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/chakra-petch-700.woff2") format("woff2");
+}
+
+/* -------------------------------------------------------------- tokens ---- */
+/* Sampled from the logo so the header and the artwork agree. */
+
+:root {
+  --byrm-red:          #e01f1f;
+  --byrm-red-bright:   #ff3a2a;
+  --byrm-red-deep:     #8f1210;
+  --byrm-ember:        #ff8c1a;
+
+  --byrm-chrome-hi:    #f4f7f9;
+  --byrm-chrome:       #c3ced8;
+  --byrm-chrome-lo:    #7c8894;
+
+  --byrm-steel-900:    #080b0f;
+  --byrm-steel-800:    #0d1117;
+  --byrm-steel-700:    #141a22;
+  --byrm-steel-600:    #1d2630;
+  --byrm-line:         #26303c;
+
+  --byrm-strip-h:      34px;
+  --byrm-bar-h:        92px;
+  --byrm-bar-h-stuck:  68px;
+  --byrm-shell:        1240px;
+
+  --byrm-font: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --byrm-ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+/* --------------------------------------------------------------- shell ---- */
+
+.byrm-header {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  font-family: var(--byrm-font);
+  background: var(--byrm-steel-800);
+  /* Brushed-steel sheen plus a faint diagonal mesh, both very low contrast
+     so the logo stays the loudest thing in the bar. */
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, .05) 0, transparent 38%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .014) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .012) 0 2px, transparent 2px 8px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .04) inset;
+  isolation: isolate;
+}
+
+.byrm-header *,
+.byrm-header *::before,
+.byrm-header *::after { box-sizing: border-box; }
+
+.byrm-header a { text-decoration: none; }
+
+.byrm-header__shell {
+  width: 100%;
+  max-width: var(--byrm-shell);
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+/* The lit edge along the bottom of the whole header. */
+.byrm-header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 5;
+  height: 3px;
+  background: linear-gradient(90deg,
+      var(--byrm-red-deep) 0%,
+      var(--byrm-red) 22%,
+      var(--byrm-ember) 50%,
+      var(--byrm-red) 78%,
+      var(--byrm-red-deep) 100%);
+  box-shadow: 0 0 16px rgba(224, 31, 31, .55);
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------- alert strip ---- */
+
+.byrm-strip {
+  position: relative;
+  z-index: 3;
+  height: var(--byrm-strip-h);
+  background: var(--byrm-steel-900);
+  border-bottom: 1px solid var(--byrm-line);
+  overflow: hidden;
+  transition: height .28s var(--byrm-ease), opacity .2s linear;
+}
+
+.byrm-strip__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: var(--byrm-strip-h);
+}
+
+.byrm-strip__status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-lo);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Flex items default to min-width:auto, which blocks shrinking and clips the
+     text without ever showing the ellipsis. */
+  min-width: 0;
+}
+
+/* Slow pulse — a live-signal cue, not a distraction. */
+.byrm-strip__beacon {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--byrm-red-bright);
+  box-shadow: 0 0 0 0 rgba(255, 58, 42, .7);
+  animation: byrm-pulse 2.6s infinite;
+}
+
+@keyframes byrm-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 58, 42, .65); }
+  70%  { box-shadow: 0 0 0 7px rgba(255, 58, 42, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 58, 42, 0); }
+}
+
+.byrm-strip__links {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex: 0 0 auto;
+}
+
+.byrm-strip__links a {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-lo);
+  transition: color .16s;
+}
+.byrm-strip__links a:hover,
+.byrm-strip__links a:focus-visible { color: var(--byrm-chrome-hi); }
+
+.byrm-strip__discord {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.byrm-strip__discord svg { width: 15px; height: 15px; fill: currentColor; }
+.byrm-strip__discord:hover { color: #7e8bff !important; }
+
+/* ------------------------------------------------------------- main bar ---- */
+
+.byrm-bar__inner {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: var(--byrm-bar-h);
+  transition: height .28s var(--byrm-ease);
+}
+
+/* ---------------------------------------------------------------- logo ---- */
+
+.byrm-logo {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  margin-right: auto;
+  line-height: 0;
+}
+
+.byrm-logo img,
+.byrm-logo .custom-logo {
+  width: auto;
+  height: 66px;
+  max-width: none;
+  /* A grounded drop shadow and a faint red bloom, so the artwork sits in the
+     bar instead of floating on top of it. */
+  filter:
+    drop-shadow(0 2px 3px rgba(0, 0, 0, .7))
+    drop-shadow(0 0 14px rgba(224, 31, 31, .22));
+  transition: height .28s var(--byrm-ease), filter .3s;
+}
+
+.byrm-logo:hover img,
+.byrm-logo:hover .custom-logo {
+  filter:
+    drop-shadow(0 2px 3px rgba(0, 0, 0, .7))
+    drop-shadow(0 0 20px rgba(255, 58, 42, .45));
+}
+
+/* ------------------------------------------------------------ main menu ---- */
+
+.byrm-nav { flex: 0 1 auto; }
+
+.byrm-nav ul {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.byrm-nav li { position: relative; }
+
+.byrm-nav > ul > li > a {
+  position: relative;
+  display: block;
+  padding: 11px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome);
+  transition: color .18s;
+}
+
+/* Angular wipe that fills from the bottom on hover — the C&C interface cue. */
+.byrm-nav > ul > li > a::before {
+  content: "";
+  position: absolute;
+  inset: auto 6px 4px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--byrm-red), var(--byrm-ember));
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .26s var(--byrm-ease);
+}
+
+.byrm-nav > ul > li > a:hover,
+.byrm-nav > ul > li > a:focus-visible { color: var(--byrm-chrome-hi); }
+
+.byrm-nav > ul > li > a:hover::before,
+.byrm-nav > ul > li > a:focus-visible::before { transform: scaleX(1); }
+
+/* Current page */
+.byrm-nav > ul > li.current-menu-item > a,
+.byrm-nav > ul > li.current_page_item > a,
+.byrm-nav > ul > li.current-menu-ancestor > a { color: #fff; }
+
+.byrm-nav > ul > li.current-menu-item > a::before,
+.byrm-nav > ul > li.current_page_item > a::before,
+.byrm-nav > ul > li.current-menu-ancestor > a::before {
+  transform: scaleX(1);
+  box-shadow: 0 0 10px rgba(224, 31, 31, .8);
+}
+
+/* -------------------------------------------------------------- submenu ---- */
+
+.byrm-nav ul ul {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 5;
+  display: block;
+  min-width: 216px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 6px;
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  border-top: 2px solid var(--byrm-red);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .55);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity .18s, transform .18s var(--byrm-ease), visibility .18s;
+}
+
+.byrm-nav li:hover > ul,
+.byrm-nav li:focus-within > ul {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.byrm-nav ul ul a {
+  display: block;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  color: var(--byrm-chrome);
+  border-left: 2px solid transparent;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.byrm-nav ul ul a:hover,
+.byrm-nav ul ul a:focus-visible {
+  background: var(--byrm-steel-600);
+  border-left-color: var(--byrm-red);
+  color: #fff;
+}
+
+/* ------------------------------------------------------------- actions ---- */
+
+.byrm-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+.byrm-iconbtn {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--byrm-line);
+  color: var(--byrm-chrome);
+  cursor: pointer;
+  transition: border-color .18s, color .18s, background .18s;
+}
+.byrm-iconbtn:hover,
+.byrm-iconbtn:focus-visible {
+  border-color: var(--byrm-red);
+  color: #fff;
+  background: rgba(224, 31, 31, .1);
+}
+.byrm-iconbtn svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* Primary call to action — skewed slab with a shine that sweeps on hover. */
+.byrm-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 26px;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(180deg, var(--byrm-red-bright), var(--byrm-red) 55%, var(--byrm-red-deep));
+  border: 1px solid rgba(255, 160, 120, .5);
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  overflow: hidden;
+  white-space: nowrap;
+  box-shadow: 0 3px 14px rgba(224, 31, 31, .35);
+  transition: box-shadow .2s, transform .1s;
+}
+
+.byrm-cta::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -70%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .45), transparent);
+  transform: skewX(-18deg);
+  transition: left .55s var(--byrm-ease);
+}
+.byrm-cta:hover::after,
+.byrm-cta:focus-visible::after { left: 125%; }
+
+.byrm-cta:hover { box-shadow: 0 5px 22px rgba(255, 58, 42, .55); color: #fff; }
+.byrm-cta:active { transform: translateY(1px); }
+
+/* --------------------------------------------------------------- search ---- */
+
+.byrm-search {
+  position: relative;
+  z-index: 3;
+  border-top: 1px solid var(--byrm-line);
+  background: var(--byrm-steel-900);
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .3s var(--byrm-ease);
+}
+.byrm-search.is-open { grid-template-rows: 1fr; }
+
+.byrm-search__clip { overflow: hidden; }
+
+.byrm-search__form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.byrm-search__form input[type="search"] {
+  flex: 1;
+  min-width: 0;
+  height: 46px;
+  padding: 0 14px;
+  font-family: var(--byrm-font);
+  font-size: 15px;
+  color: var(--byrm-chrome-hi);
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  border-radius: 0;
+}
+.byrm-search__form input[type="search"]::placeholder { color: var(--byrm-chrome-lo); }
+.byrm-search__form input[type="search"]:focus {
+  outline: none;
+  border-color: var(--byrm-red);
+  box-shadow: 0 0 0 3px rgba(224, 31, 31, .16);
+}
+
+/* --------------------------------------------------------------- burger ---- */
+
+.byrm-burger { display: none; }
+.byrm-burger .byrm-burger__box {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 14px;
+}
+.byrm-burger .byrm-burger__box span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  transition: transform .26s var(--byrm-ease), opacity .18s;
+}
+.byrm-burger .byrm-burger__box span:nth-child(1) { top: 0; }
+.byrm-burger .byrm-burger__box span:nth-child(2) { top: 6px; }
+.byrm-burger .byrm-burger__box span:nth-child(3) { top: 12px; }
+
+.byrm-burger[aria-expanded="true"] .byrm-burger__box span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.byrm-burger[aria-expanded="true"] .byrm-burger__box span:nth-child(2) { opacity: 0; }
+.byrm-burger[aria-expanded="true"] .byrm-burger__box span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* --------------------------------------------------- condensed on scroll ---- */
+
+.byrm-header.is-stuck .byrm-strip { height: 0; opacity: 0; border-bottom-color: transparent; }
+.byrm-header.is-stuck .byrm-bar__inner { height: var(--byrm-bar-h-stuck); }
+.byrm-header.is-stuck .byrm-logo img,
+.byrm-header.is-stuck .byrm-logo .custom-logo { height: 46px; }
+.byrm-header.is-stuck { box-shadow: 0 10px 34px rgba(0, 0, 0, .55); }
+
+/* ----------------------------------------------------------- responsive ---- */
+
+@media (max-width: 1100px) {
+  .byrm-nav > ul > li > a { padding: 11px 12px; font-size: 13px; letter-spacing: .07em; }
+  .byrm-bar__inner { gap: 18px; }
+}
+
+@media (max-width: 980px) {
+  :root { --byrm-bar-h: 76px; --byrm-bar-h-stuck: 62px; }
+
+  .byrm-burger { display: grid; }
+  /* Only the bar CTA hides here — the one in the menu panel and the search
+     submit button both keep their own display. */
+  .byrm-bar .byrm-cta { display: none; }
+
+  .byrm-logo img,
+  .byrm-logo .custom-logo { height: 46px; }
+  .byrm-header.is-stuck .byrm-logo img,
+  .byrm-header.is-stuck .byrm-logo .custom-logo { height: 38px; }
+
+  /* Menu becomes a panel that starts below the header, so the logo and the
+     close button stay visible and clickable. --byrm-header-h is published by
+     header.js and tracks the condensed state. */
+  .byrm-nav {
+    position: fixed;
+    top: var(--byrm-header-h, 110px);
+    right: 0;
+    bottom: 0;
+    left: auto;
+    z-index: 2;
+    width: min(360px, 86vw);
+    padding: 12px 0 32px;
+    background: var(--byrm-steel-800);
+    border-left: 1px solid var(--byrm-line);
+    box-shadow: -20px 0 60px rgba(0, 0, 0, .6);
+    transform: translateX(100%);
+    transition: transform .32s var(--byrm-ease);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .byrm-nav.is-open { transform: translateX(0); }
+
+  .byrm-nav ul { flex-direction: column; align-items: stretch; gap: 0; }
+
+  .byrm-nav > ul > li { border-bottom: 1px solid var(--byrm-line); }
+  .byrm-nav > ul > li > a { padding: 16px 24px; font-size: 15px; letter-spacing: .1em; }
+  .byrm-nav > ul > li > a::before { inset: auto auto 0 0; width: 3px; height: 100%; transform: scaleY(0); transform-origin: bottom; }
+  .byrm-nav > ul > li > a:hover::before { transform: scaleY(1); }
+
+  .byrm-nav ul ul {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    min-width: 0;
+    padding: 0 0 8px 24px;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
+  /* CTA repeated inside the panel, since the bar version is hidden here. */
+  .byrm-nav__cta { display: block; padding: 24px; }
+  .byrm-nav__cta .byrm-cta { display: inline-flex; width: 100%; justify-content: center; }
+
+  .byrm-backdrop {
+    position: fixed;
+    inset: var(--byrm-header-h, 110px) 0 0;
+    z-index: 997;
+    background: rgba(4, 6, 9, .72);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s, visibility .3s;
+  }
+  .byrm-backdrop.is-open { opacity: 1; visibility: visible; }
+}
+
+@media (min-width: 981px) {
+  .byrm-nav__cta { display: none; }
+  .byrm-backdrop { display: none; }
+}
+
+@media (max-width: 600px) {
+  .byrm-header__shell { padding-inline: 14px; }
+  .byrm-strip__status { letter-spacing: .08em; font-size: 10.5px; }
+  .byrm-strip__links a:not(.byrm-strip__discord) { display: none; }
+  .byrm-logo img,
+  .byrm-logo .custom-logo { height: 34px; }
+  .byrm-header.is-stuck .byrm-logo img,
+  .byrm-header.is-stuck .byrm-logo .custom-logo { height: 30px; }
+}
+
+/* ------------------------------------------------------- accessibility ---- */
+
+.byrm-header :focus-visible {
+  outline: 2px solid var(--byrm-ember);
+  outline-offset: 2px;
+}
+
+.byrm-skip {
+  position: absolute;
+  left: 20px;
+  top: -200%;
+  z-index: 1000;
+  padding: 10px 18px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  background: var(--byrm-red);
+  color: #fff;
+}
+.byrm-skip:focus { top: 8px; }
+
+.byrm-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .byrm-header *,
+  .byrm-header *::before,
+  .byrm-header *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

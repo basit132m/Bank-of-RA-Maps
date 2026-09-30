@@ -1,0 +1,18 @@
+/*
+Theme Name:   Bank of YR Maps
+Theme URI:    https://bankofyrmaps.com
+Description:  Astra child theme for Bank of YR Maps — a catalogue of original
+              multiplayer maps for Command & Conquer: Red Alert 2 - Yuri's Revenge.
+Author:       Bank of YR Maps
+Template:     astra
+Version:      1.0.0
+Text Domain:  astra-child
+*/
+
+/* Header styles live in assets/css/header.css, enqueued from functions.php. */
+
+/* Astra's own header is replaced by ours, so remove the gap it reserves. */
+.ast-primary-header-bar,
+.ast-header-break-point .ast-mobile-header-wrap {
+  border: 0;
+}
