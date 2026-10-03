@@ -1,0 +1,99 @@
+name: Deploy to bankofyrmaps.com
+
+# One push puts the theme and plugin on the live site. Nothing is copied by
+# hand, and nothing runs on anybody's laptop — GitHub's runner does the work.
+#
+# Before the first real run, start it once from the Actions tab with "Dry run"
+# left ticked. That prints every file it WOULD change without touching the
+# server, which is the only safe way to find out whether the live site has
+# edits this repository does not know about.
+
+on:
+  push:
+    branches:
+      - claude/dazzling-dirac-ck03on
+      - main
+    paths:
+      - 'wp-content/**'
+      - '.github/workflows/deploy.yml'
+
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — list changes without making them'
+        type: boolean
+        default: true
+
+concurrency:
+  # Two deploys writing to the same directory at once would interleave files.
+  group: deploy-live
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Load the deploy key
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          # Pin the server's fingerprint so this cannot be redirected to
+          # another host midway through a deploy.
+          ssh-keyscan -p "${DEPLOY_PORT:-21098}" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy the theme and plugins
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+
+          PORT="${DEPLOY_PORT:-21098}"
+          ROOT="${DEPLOY_PATH:-public_html}"
+          ROOT="${ROOT%/}"
+
+          FLAGS="-rlvz --delete --omit-dir-times --no-perms --no-owner --no-group"
+
+          # A manual run defaults to a dry run; a push never does.
+          if [ "${DRY_RUN:-false}" = "true" ]; then
+            FLAGS="$FLAGS --dry-run"
+            echo "::notice::DRY RUN — listing changes only, the server is not touched."
+          fi
+
+          sync_dir() {
+            local src="$1" dest="$2"
+
+            if [ ! -d "$src" ]; then
+              echo "Skipping $src — not in this repository."
+              return 0
+            fi
+
+            echo "=== $src  ->  $ROOT/$dest"
+
+            # The trailing slashes matter: they mean "the contents of", so the
+            # directory is not nested inside itself on the server.
+            rsync $FLAGS \
+              --exclude '.git*' \
+              --exclude '.DS_Store' \
+              --exclude 'node_modules/' \
+              -e "ssh -p $PORT -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes" \
+              "$src/" "$DEPLOY_USER@$DEPLOY_HOST:$ROOT/$dest/"
+          }
+
+          sync_dir "wp-content/themes/astra-child" "wp-content/themes/astra-child"
+          sync_dir "wp-content/plugins/byrm-maps"  "wp-content/plugins/byrm-maps"
+
+          echo "Done."

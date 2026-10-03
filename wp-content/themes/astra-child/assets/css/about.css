@@ -1,0 +1,199 @@
+/* ============================================================================
+ * About page
+ *
+ * Loaded after home.css (buttons) and guide.css (banner, blocks, notes, panel),
+ * so this file only holds what is unique to this page. Every class here is
+ * prefixed byrm-about- and none of it exists in the stylesheets it loads
+ * alongside — checked against header, footer, home, guide, archive, map,
+ * community, search and tweaker.
+ * ========================================================================= */
+
+/* ------------------------------------------------------------- figures ---- */
+
+.byrm-about-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 0 0 clamp(30px, 4vw, 46px);
+  padding: 0;
+  list-style: none;
+}
+
+.byrm-about-stat {
+  padding: 18px 20px;
+  text-align: center;
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  border-top: 2px solid var(--byrm-red);
+}
+
+.byrm-about-stat__num {
+  display: block;
+  font-size: clamp(26px, 3.4vw, 34px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -.01em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.byrm-about-stat__label {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-lo);
+}
+
+/* The short version panel reuses .byrm-glance, which styles its heading and
+   its list but not loose paragraphs — this page uses paragraphs. */
+.byrm-about .byrm-glance p {
+  margin: 0 0 12px;
+  max-width: 68ch;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--byrm-chrome);
+}
+.byrm-about .byrm-glance p:last-child { margin-bottom: 0; }
+
+/* ------------------------------------------------------------- pillars ---- */
+
+.byrm-about-pillars {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.byrm-about-pillar {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 20px;
+  padding-block: clamp(20px, 2.6vw, 28px);
+  border-bottom: 1px solid var(--byrm-line);
+}
+.byrm-about-pillar:last-child { border-bottom: 0; padding-bottom: 0; }
+
+.byrm-about-pillar__num {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.02em;
+  color: var(--byrm-red-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+.byrm-about-pillar__title {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: .01em;
+  color: var(--byrm-chrome-hi);
+}
+
+.byrm-about-pillar__text {
+  margin: 0;
+  max-width: 68ch;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--byrm-chrome);
+}
+
+/* --------------------------------------------------------- good to know ---- */
+
+.byrm-about-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 14px;
+  margin: 0;
+}
+
+.byrm-about-fact {
+  padding: 20px 22px;
+  background: var(--byrm-steel-800);
+  border: 1px solid var(--byrm-line);
+}
+
+.byrm-about-fact__term {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--byrm-red-bright);
+}
+
+.byrm-about-fact__desc {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--byrm-chrome);
+}
+.byrm-about-fact__desc a { color: var(--byrm-chrome-hi); text-decoration: underline; }
+.byrm-about-fact__desc a:hover { color: var(--byrm-red-bright); }
+
+/* ------------------------------------------------------------- contact ---- */
+
+.byrm-about-contact {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--byrm-line);
+}
+
+.byrm-about-contact__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 18px;
+  padding-block: 14px;
+  border-bottom: 1px solid var(--byrm-line);
+  font-size: 15px;
+}
+
+.byrm-about-contact__label {
+  flex: 0 0 110px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-about-contact__row a { color: var(--byrm-chrome-hi); }
+.byrm-about-contact__row a:hover { color: var(--byrm-red-bright); }
+
+.byrm-about-contact__note {
+  margin: 16px 0 0;
+  max-width: 68ch;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--byrm-chrome-lo);
+}
+.byrm-about-contact__note a { color: var(--byrm-chrome-hi); text-decoration: underline; }
+.byrm-about-contact__note a:hover { color: var(--byrm-red-bright); }
+
+/* ----------------------------------------------------------- cta buttons ---- */
+
+.byrm-about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* -------------------------------------------------------------- narrow ---- */
+
+@media (max-width: 600px) {
+  .byrm-about-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .byrm-about-stat { padding: 14px 12px; }
+
+  .byrm-about-pillar { grid-template-columns: 40px minmax(0, 1fr); gap: 14px; }
+  .byrm-about-pillar__num { font-size: 19px; }
+
+  .byrm-about-fact { padding: 16px 18px; }
+
+  .byrm-about-contact__label { flex: 1 1 100%; }
+
+  .byrm-about-actions .byrm-btn { flex: 1 1 auto; justify-content: center; }
+}

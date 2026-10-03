@@ -1,0 +1,379 @@
+/* ==========================================================================
+   Bank of YR Maps — maps archive
+   Card, button and pill components come from home.css, which is loaded
+   alongside this file so both pages share one definition of them.
+   ========================================================================== */
+
+.byrm-archive {
+  font-family: var(--byrm-font);
+  color: var(--byrm-chrome);
+  background: var(--byrm-steel-800);
+}
+
+.byrm-archive *,
+.byrm-archive *::before,
+.byrm-archive *::after { box-sizing: border-box; }
+
+.byrm-archive a { text-decoration: none; }
+
+.byrm-archive__shell {
+  width: 100%;
+  max-width: var(--byrm-shell);
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+/* -------------------------------------------------------------- banner ---- */
+
+.byrm-abanner {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1px solid var(--byrm-line);
+  background-color: var(--byrm-steel-900);
+}
+
+.byrm-abanner__veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(800px 320px at 15% 0%, rgba(224, 31, 31, .2), transparent 70%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .018) 0 2px, transparent 2px 9px);
+}
+
+.byrm-abanner__inner { padding-block: clamp(30px, 5vw, 54px) clamp(26px, 4vw, 40px); }
+
+.byrm-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 12.5px;
+  letter-spacing: .04em;
+  color: var(--byrm-chrome-lo);
+}
+.byrm-crumbs a { color: var(--byrm-chrome-lo); }
+.byrm-crumbs a:hover { color: var(--byrm-red-bright); }
+.byrm-crumbs span[aria-hidden] { color: var(--byrm-line); }
+
+.byrm-abanner__title {
+  margin: 0 0 12px;
+  font-size: clamp(28px, 4.6vw, 46px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -.01em;
+  color: #fff;
+}
+
+.byrm-abanner__lead {
+  margin: 0;
+  max-width: 64ch;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-abanner__stat {
+  margin: 16px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--byrm-red-bright);
+}
+
+/* -------------------------------------------------------------- layout ---- */
+
+.byrm-archive__layout {
+  display: grid;
+  grid-template-columns: 268px minmax(0, 1fr);
+  gap: clamp(22px, 3vw, 40px);
+  align-items: start;
+  padding-block: clamp(26px, 4vw, 44px);
+}
+
+/* ------------------------------------------------------------- filters ---- */
+
+.byrm-filters { position: sticky; top: 96px; }
+
+.byrm-filters__form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px;
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  border-top: 2px solid var(--byrm-red);
+}
+
+.byrm-fgroup { margin: 0; padding: 0; border: 0; }
+
+.byrm-fgroup__title {
+  display: block;
+  margin-bottom: 11px;
+  padding: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-lo);
+}
+
+/* search — named apart from the header's .byrm-fsearch drawer, which would
+   otherwise be forced open by these rules. */
+
+.byrm-fsearch { display: flex; }
+
+.byrm-fsearch input[type="search"] {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0 12px;
+  font-family: var(--byrm-font);
+  font-size: 14px;
+  color: var(--byrm-chrome-hi);
+  background: var(--byrm-steel-900);
+  border: 1px solid var(--byrm-line);
+  border-right: 0;
+  border-radius: 0;
+}
+.byrm-fsearch input[type="search"]::placeholder { color: var(--byrm-chrome-lo); }
+.byrm-fsearch input[type="search"]:focus { outline: none; border-color: var(--byrm-red); }
+
+.byrm-fsearch button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 42px;
+  padding: 0;
+  background: var(--byrm-steel-600);
+  border: 1px solid var(--byrm-line);
+  color: var(--byrm-chrome);
+  cursor: pointer;
+  transition: background .18s, color .18s;
+}
+.byrm-fsearch button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
+.byrm-fsearch button:hover { background: var(--byrm-red); color: #fff; border-color: var(--byrm-red); }
+
+/* player count chips */
+
+.byrm-chipset { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.byrm-choice {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--byrm-chrome);
+  background: var(--byrm-steel-900);
+  border: 1px solid var(--byrm-line);
+  transition: border-color .18s, color .18s, background .18s;
+}
+.byrm-choice span { font-size: 10.5px; font-weight: 600; color: var(--byrm-chrome-lo); }
+.byrm-choice:hover { border-color: var(--byrm-red); color: #fff; }
+.byrm-choice.is-on {
+  background: rgba(224, 31, 31, .15);
+  border-color: var(--byrm-red);
+  color: #fff;
+}
+.byrm-choice.is-on span { color: var(--byrm-red-bright); }
+
+/* term lists */
+
+.byrm-flist { margin: 0; padding: 0; list-style: none; }
+.byrm-flist li + li { margin-top: 2px; }
+
+.byrm-flist__item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 8px;
+  font-size: 13.5px;
+  color: var(--byrm-chrome);
+  transition: background .15s, color .15s;
+}
+.byrm-flist__item:hover { background: var(--byrm-steel-600); color: #fff; }
+
+/* A checkbox drawn in CSS — these are links, so a real input would be wrong. */
+.byrm-flist__box {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--byrm-border-strong, #3a4857);
+  background: var(--byrm-steel-900);
+  position: relative;
+  transition: background .15s, border-color .15s;
+}
+
+.byrm-flist__item.is-on .byrm-flist__box { background: var(--byrm-red); border-color: var(--byrm-red); }
+.byrm-flist__item.is-on .byrm-flist__box::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.byrm-flist__item.is-on { color: #fff; }
+
+.byrm-flist__name { flex: 1; min-width: 0; }
+.byrm-flist__count { flex: 0 0 auto; font-size: 11.5px; color: var(--byrm-chrome-lo); }
+
+.byrm-filters__clear {
+  align-self: flex-start;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--byrm-red-bright);
+  border-bottom: 1px solid rgba(224, 31, 31, .4);
+}
+.byrm-filters__clear:hover { color: var(--byrm-ember); }
+
+.byrm-filters__apply { width: 100%; }
+
+/* the mobile toggle */
+
+.byrm-filters__toggle {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 13px 18px;
+  font-family: var(--byrm-font);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  cursor: pointer;
+}
+.byrm-filters__toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+.byrm-filters__badge {
+  margin-left: auto;
+  padding: 2px 8px;
+  font-size: 11px;
+  background: var(--byrm-red);
+  color: #fff;
+}
+
+/* ------------------------------------------------------------- results ---- */
+
+.byrm-results__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--byrm-line);
+}
+
+.byrm-results__count { margin: 0; font-size: 14px; color: var(--byrm-chrome-lo); }
+.byrm-results__count strong { color: var(--byrm-chrome-hi); font-size: 17px; font-weight: 700; }
+
+.byrm-sort select {
+  height: 38px;
+  padding: 0 10px;
+  font-family: var(--byrm-font);
+  font-size: 13px;
+  color: var(--byrm-chrome);
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  border-radius: 0;
+  cursor: pointer;
+}
+.byrm-sort select:focus { outline: none; border-color: var(--byrm-red); }
+
+/* active filter chips */
+
+.byrm-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+
+.byrm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  color: var(--byrm-chrome-hi);
+  background: rgba(224, 31, 31, .13);
+  border: 1px solid rgba(224, 31, 31, .5);
+  transition: background .18s;
+}
+.byrm-chip span[aria-hidden] { font-size: 15px; line-height: 1; color: var(--byrm-red-bright); }
+.byrm-chip:hover { background: rgba(224, 31, 31, .25); color: #fff; }
+
+/* ---------------------------------------------------------- pagination ---- */
+
+.byrm-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 34px;
+}
+
+.byrm-pagination .page-numbers {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 13px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--byrm-chrome);
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  transition: border-color .18s, color .18s, background .18s;
+}
+.byrm-pagination a.page-numbers:hover { border-color: var(--byrm-red); color: #fff; background: rgba(224, 31, 31, .12); }
+.byrm-pagination .page-numbers.current {
+  background: linear-gradient(180deg, var(--byrm-red-bright), var(--byrm-red));
+  border-color: var(--byrm-red);
+  color: #fff;
+}
+.byrm-pagination .page-numbers.dots { background: transparent; border-color: transparent; }
+
+/* ---------------------------------------------------------- responsive ---- */
+
+@media (max-width: 1000px) {
+  .byrm-archive__layout { grid-template-columns: 236px minmax(0, 1fr); }
+}
+
+@media (max-width: 860px) {
+  .byrm-archive__layout { grid-template-columns: 1fr; gap: 16px; }
+
+  .byrm-filters__toggle { display: flex; }
+
+  /* Collapsed by default on small screens; the toggle expands it. */
+  .byrm-filters { position: static; display: none; }
+  .byrm-filters.is-open { display: block; }
+}
+
+@media (max-width: 600px) {
+  .byrm-archive__shell { padding-inline: 14px; }
+  .byrm-results__bar { gap: 10px; }
+  .byrm-sort select { width: 100%; }
+  .byrm-sort { width: 100%; }
+}
+
+/* ------------------------------------------------------- accessibility ---- */
+
+.byrm-archive :focus-visible {
+  outline: 2px solid var(--byrm-ember);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .byrm-archive *,
+  .byrm-archive *::before { transition-duration: .01ms !important; }
+}

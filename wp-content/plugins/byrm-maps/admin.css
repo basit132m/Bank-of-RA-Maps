@@ -1,0 +1,65 @@
+/* Map edit screen — gallery and file panels. */
+
+.byrm-gallery-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.byrm-gallery-list:empty { display: none; }
+
+.byrm-gallery-item {
+  position: relative;
+  margin: 0;
+  border: 1px solid #c3c4c7;
+  background: #f6f7f7;
+  cursor: move;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.byrm-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* First item is the one shown first on the front end. */
+.byrm-gallery-item:first-child::after {
+  content: "First";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 2px 7px;
+  font-size: 11px;
+  background: #2271b1;
+  color: #fff;
+}
+
+.byrm-gallery-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-size: 17px;
+  line-height: 1;
+  color: #fff;
+  background: rgba(0, 0, 0, .65);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.byrm-gallery-remove:hover { background: #d63638; }
+
+.byrm-gallery-item.ui-sortable-helper { opacity: .85; }
+
+.byrm-specs-table td .description { margin-top: 4px; }
+
+/* Shown when a stored download link is not a usable http(s) URL. */
+.byrm-file-box .byrm-warn { color: #b32d2e; font-weight: 600; }

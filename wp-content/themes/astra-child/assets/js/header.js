@@ -22,6 +22,14 @@
 
   var DESKTOP = 981;
 
+  // Separate thresholds for condensing and expanding. Condensing removes ~58px
+  // of header, which shortens the page and can nudge the scroll position back
+  // across a single threshold — the header then flips state repeatedly and
+  // visibly shakes. The gap between these two values is wider than that shift,
+  // so each change settles on the first try.
+  var CONDENSE_AT = 140;
+  var EXPAND_AT = 60;
+
   // ------------------------------------------------- publish header height
   // The mobile menu panel and its backdrop start directly below the header,
   // so they need its current height — which changes when it condenses.
@@ -34,7 +42,15 @@
   var ticking = false;
 
   function applyScrollState() {
-    header.classList.toggle('is-stuck', window.scrollY > 40);
+    var y = window.scrollY;
+    var condensed = header.classList.contains('is-stuck');
+
+    if (!condensed && y > CONDENSE_AT) {
+      header.classList.add('is-stuck');
+    } else if (condensed && y < EXPAND_AT) {
+      header.classList.remove('is-stuck');
+    }
+
     // Read back after the class change so the panel follows the new height.
     window.setTimeout(publishHeight, 300);
     publishHeight();

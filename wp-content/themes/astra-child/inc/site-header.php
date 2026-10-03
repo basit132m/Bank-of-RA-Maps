@@ -39,20 +39,26 @@ function byrm_header_config() {
 function byrm_header_logo() {
 	$config = byrm_header_config();
 
-	echo '<a class="byrm-logo" href="' . esc_url( home_url( '/' ) ) . '" rel="home">';
-
+	// the_custom_logo() renders its OWN <a>, so it must not be wrapped in another
+	// one: nested anchors are invalid HTML, and browsers split them apart. That
+	// leaves an empty .byrm-logo behind whose margin-right:auto shoves the logo
+	// and the whole nav to the right, and puts the image outside our sizing CSS.
 	if ( function_exists( 'has_custom_logo' ) && has_custom_logo() ) {
-		// Customizer logo wins, so the site owner can swap it without editing files.
+		echo '<div class="byrm-logo">';
 		the_custom_logo();
-	} else {
-		printf(
-			'<img src="%1$s" alt="%2$s" width="2000" height="668" fetchpriority="high" decoding="async">',
-			esc_url( get_stylesheet_directory_uri() . '/assets/img/logo.webp' ),
-			esc_attr( $config['logo_alt'] )
-		);
+		echo '</div>';
+
+		return;
 	}
 
-	echo '</a>';
+	printf(
+		'<a class="byrm-logo" href="%1$s" rel="home">'
+		. '<img src="%2$s" alt="%3$s" width="2000" height="668" fetchpriority="high" decoding="async">'
+		. '</a>',
+		esc_url( home_url( '/' ) ),
+		esc_url( get_stylesheet_directory_uri() . '/assets/img/logo.webp' ),
+		esc_attr( $config['logo_alt'] )
+	);
 }
 
 /**
@@ -96,9 +102,27 @@ function byrm_header_nav() {
  * Output the whole header.
  */
 function byrm_render_site_header() {
+	// The shell calls this directly, and it may also be hooked into Astra or
+	// wp_body_open. Whichever fires first wins; the rest are no-ops, so two
+	// headers can never stack.
+	static $rendered = false;
+
+	if ( $rendered ) {
+		return;
+	}
+
+	$rendered = true;
+
 	$config = byrm_header_config();
+
+	// Our own templates use #byrm-content; every other page keeps Astra's #content.
+	// byrm_is_full_width_template() is the exact list of templates that draw
+	// their own document, so the two can never drift apart as pages are added.
+	$ours = function_exists( 'byrm_is_full_width_template' ) && byrm_is_full_width_template();
+
+	$skip_target = $ours ? '#byrm-content' : '#content';
 	?>
-	<a class="byrm-skip" href="#content"><?php esc_html_e( 'Skip to content', 'astra-child' ); ?></a>
+	<a class="byrm-skip" href="<?php echo esc_attr( $skip_target ); ?>"><?php esc_html_e( 'Skip to content', 'astra-child' ); ?></a>
 
 	<header class="byrm-header" id="byrm-header" data-byrm-header>
 

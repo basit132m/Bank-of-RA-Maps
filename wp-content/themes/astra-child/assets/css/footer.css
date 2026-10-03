@@ -1,0 +1,443 @@
+/* ==========================================================================
+   Bank of YR Maps — site footer
+   Counterpart to the header: same palette, same angular language, mirrored
+   lit edge. Namespaced under .byrm-footer.
+
+   Depends on header.css for the .byrm-cta button. Tokens are re-declared here
+   with identical values so this file also stands on its own.
+   ========================================================================== */
+
+:root {
+  --byrm-red:          #e01f1f;
+  --byrm-red-bright:   #ff3a2a;
+  --byrm-red-deep:     #8f1210;
+  --byrm-ember:        #ff8c1a;
+
+  --byrm-chrome-hi:    #f4f7f9;
+  --byrm-chrome:       #c3ced8;
+  --byrm-chrome-lo:    #7c8894;
+
+  --byrm-steel-900:    #080b0f;
+  --byrm-steel-800:    #0d1117;
+  --byrm-steel-700:    #141a22;
+  --byrm-steel-600:    #1d2630;
+  --byrm-line:         #26303c;
+
+  --byrm-shell:        1240px;
+  --byrm-font: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --byrm-ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+/* --------------------------------------------------------------- shell ---- */
+
+.byrm-footer {
+  position: relative;
+  font-family: var(--byrm-font);
+  color: var(--byrm-chrome);
+  background: var(--byrm-steel-900);
+  /* A red bloom rising from the top edge, over a faint tactical grid. */
+  background-image:
+    radial-gradient(900px 260px at 50% 0%, rgba(224, 31, 31, .13), transparent 72%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .018) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, .018) 0 1px, transparent 1px 48px);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.byrm-footer *,
+.byrm-footer *::before,
+.byrm-footer *::after { box-sizing: border-box; }
+
+.byrm-footer a { text-decoration: none; }
+
+.byrm-footer__shell {
+  width: 100%;
+  max-width: var(--byrm-shell);
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+/* Lit edge along the top, mirroring the one under the header. */
+.byrm-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 4;
+  height: 3px;
+  background: linear-gradient(90deg,
+      var(--byrm-red-deep) 0%,
+      var(--byrm-red) 22%,
+      var(--byrm-ember) 50%,
+      var(--byrm-red) 78%,
+      var(--byrm-red-deep) 100%);
+  box-shadow: 0 0 18px rgba(224, 31, 31, .5);
+  pointer-events: none;
+}
+
+/* A slow signal sweep travelling along that edge. */
+.byrm-footer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -30%;
+  z-index: 5;
+  width: 30%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .85), transparent);
+  animation: byrm-sweep 7s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes byrm-sweep {
+  0%   { left: -30%; }
+  100% { left: 100%; }
+}
+
+/* ----------------------------------------------------------- call to act ---- */
+
+.byrm-footer__cta {
+  position: relative;
+  background: linear-gradient(180deg, var(--byrm-steel-700), var(--byrm-steel-800));
+  border-bottom: 1px solid var(--byrm-line);
+}
+
+/* Diagonal hazard shading, fading in from the right. */
+.byrm-footer__cta::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 45%;
+  background: repeating-linear-gradient(135deg,
+      rgba(224, 31, 31, .05) 0 10px, transparent 10px 20px);
+  mask-image: linear-gradient(90deg, transparent, #000);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000);
+  pointer-events: none;
+}
+
+.byrm-fcta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+  padding-block: 44px;
+}
+
+.byrm-fcta__copy h2 {
+  margin: 0 0 6px;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 700;
+  letter-spacing: .01em;
+  color: var(--byrm-chrome-hi);
+  text-transform: uppercase;
+}
+
+.byrm-fcta__copy p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--byrm-chrome-lo);
+  max-width: 52ch;
+}
+
+.byrm-fcta__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Secondary button — outline counterpart to the solid red .byrm-cta. */
+.byrm-fbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 24px;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome);
+  background: transparent;
+  border: 1px solid var(--byrm-line);
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  transition: color .18s, border-color .18s, background .18s;
+}
+.byrm-fbtn svg { width: 17px; height: 17px; fill: currentColor; }
+.byrm-fbtn:hover,
+.byrm-fbtn:focus-visible {
+  color: #fff;
+  border-color: #5865f2;
+  background: rgba(88, 101, 242, .16);
+}
+
+/* ---------------------------------------------------------------- main ---- */
+
+.byrm-footer__main { padding-block: 56px 40px; }
+
+.byrm-footer__grid {
+  display: grid;
+  /* A wider brand column keeps the tagline to two lines, so the panel does not
+     tower over the link columns beside it. */
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.7fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: start;
+}
+
+/* --------------------------------------------------------------- brand ---- */
+
+.byrm-fbrand {
+  position: relative;
+  padding: 26px;
+  border: 1px solid var(--byrm-line);
+  background: rgba(13, 17, 23, .6);
+}
+
+/* HUD corner brackets on opposing corners. */
+.byrm-fbrand::before,
+.byrm-fbrand::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--byrm-red);
+  pointer-events: none;
+}
+.byrm-fbrand::before { top: -1px;    left: -1px;  border-right: 0; border-bottom: 0; }
+.byrm-fbrand::after  { bottom: -1px; right: -1px; border-left: 0;  border-top: 0; }
+
+.byrm-fbrand__logo { display: block; line-height: 0; margin-bottom: 18px; }
+.byrm-fbrand__logo .custom-logo-link { display: block; margin: 0; padding: 0; line-height: 0; }
+
+/* !important for the same reason as the header: Astra's Customizer logo CSS. */
+.byrm-footer .byrm-fbrand__logo img,
+.byrm-footer .byrm-fbrand__logo .custom-logo {
+  width: auto !important;
+  height: 48px !important;
+  max-width: 100% !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .7));
+}
+
+.byrm-fbrand__text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-fbrand__contact { margin: 14px 0 0; font-size: 14px; }
+.byrm-fbrand__contact a { color: var(--byrm-chrome); border-bottom: 1px solid var(--byrm-line); }
+.byrm-fbrand__contact a:hover { color: var(--byrm-red-bright); border-bottom-color: currentColor; }
+
+/* ------------------------------------------------------------- columns ---- */
+
+.byrm-footer__cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 28px 24px;
+}
+
+.byrm-fcol__title {
+  position: relative;
+  margin: 0 0 18px;
+  padding-bottom: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+}
+
+/* Short lit rule under each heading. */
+.byrm-fcol__title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 26px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--byrm-red), var(--byrm-ember));
+}
+
+.byrm-fcol__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.byrm-fcol__list li { margin-bottom: 11px; }
+
+.byrm-fcol__list a {
+  position: relative;
+  display: inline-block;
+  padding-left: 0;
+  font-size: 14.5px;
+  color: var(--byrm-chrome-lo);
+  transition: color .18s var(--byrm-ease), padding-left .18s var(--byrm-ease);
+}
+
+/* Chevron slides in from the left on hover. */
+.byrm-fcol__list a::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-right: 2px solid var(--byrm-red);
+  border-top: 2px solid var(--byrm-red);
+  transform: translateX(-8px) rotate(45deg);
+  opacity: 0;
+  transition: opacity .18s, transform .18s var(--byrm-ease);
+}
+
+.byrm-fcol__list a:hover,
+.byrm-fcol__list a:focus-visible {
+  color: var(--byrm-chrome-hi);
+  padding-left: 15px;
+}
+.byrm-fcol__list a:hover::before,
+.byrm-fcol__list a:focus-visible::before { opacity: 1; transform: translateX(0) rotate(45deg); }
+
+/* --------------------------------------------------------------- stats ---- */
+
+.byrm-fstats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 44px 0 0;
+  padding-top: 26px;
+  border-top: 1px solid var(--byrm-line);
+}
+
+.byrm-fstats__item {
+  /* Capped so a single counter reads as a compact card instead of stretching
+     the full width of the footer. */
+  flex: 1 1 180px;
+  max-width: 300px;
+  padding: 14px 18px;
+  background: rgba(20, 26, 34, .72);
+  border: 1px solid var(--byrm-line);
+  border-left: 2px solid var(--byrm-red);
+}
+
+.byrm-fstats__item dt {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-fstats__item dd {
+  margin: 4px 0 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--byrm-chrome-hi);
+}
+
+/* ---------------------------------------------------------------- base ---- */
+
+.byrm-footer__base {
+  background: rgba(4, 6, 9, .75);
+  border-top: 1px solid var(--byrm-line);
+}
+
+.byrm-fbase {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-block: 20px;
+}
+
+.byrm-fbase__legal p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-fbase__disclaimer { margin-top: 4px !important; opacity: .72; max-width: 78ch; }
+
+/* Back to top — skewed slab, matching the header's call to action. */
+.byrm-totop {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 20px;
+  font-family: var(--byrm-font);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome);
+  background: transparent;
+  border: 1px solid var(--byrm-line);
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition: color .18s, border-color .18s, background .18s;
+}
+
+.byrm-totop svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  transition: transform .22s var(--byrm-ease);
+}
+
+.byrm-totop:hover,
+.byrm-totop:focus-visible {
+  color: #fff;
+  border-color: var(--byrm-red);
+  background: rgba(224, 31, 31, .12);
+}
+.byrm-totop:hover svg { transform: translateY(-3px); }
+
+/* ----------------------------------------------------------- responsive ---- */
+
+@media (max-width: 900px) {
+  .byrm-footer__grid { grid-template-columns: 1fr; }
+  .byrm-footer__main { padding-block: 44px 32px; }
+}
+
+@media (max-width: 720px) {
+  .byrm-fcta { padding-block: 34px; gap: 22px; }
+  .byrm-fcta__actions { width: 100%; }
+  .byrm-fcta__actions .byrm-cta,
+  .byrm-fcta__actions .byrm-fbtn { flex: 1 1 auto; justify-content: center; }
+  .byrm-footer__cta::before { display: none; }
+}
+
+@media (max-width: 600px) {
+  .byrm-footer__shell { padding-inline: 14px; }
+  .byrm-footer__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; }
+  .byrm-fbase { justify-content: flex-start; }
+  .byrm-fbrand { padding: 20px; }
+  .byrm-footer .byrm-fbrand__logo img,
+  .byrm-footer .byrm-fbrand__logo .custom-logo { height: 42px !important; }
+}
+
+/* ------------------------------------------------------- accessibility ---- */
+
+.byrm-footer :focus-visible {
+  outline: 2px solid var(--byrm-ember);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .byrm-footer::after { display: none; }
+  .byrm-footer *,
+  .byrm-footer *::before,
+  .byrm-footer *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

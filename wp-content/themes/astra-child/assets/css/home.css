@@ -1,0 +1,510 @@
+/* ==========================================================================
+   Bank of YR Maps — home page
+   Tokens come from header.css; this file is otherwise self-contained.
+   ========================================================================== */
+
+.byrm-home {
+  font-family: var(--byrm-font);
+  color: var(--byrm-chrome);
+  background: var(--byrm-steel-800);
+}
+
+.byrm-home *,
+.byrm-home *::before,
+.byrm-home *::after { box-sizing: border-box; }
+
+.byrm-home a { text-decoration: none; }
+
+.byrm-home__shell {
+  width: 100%;
+  max-width: var(--byrm-shell);
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+/* ------------------------------------------------------------- buttons ---- */
+
+.byrm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 14px 28px;
+  font-family: var(--byrm-font);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+  background: transparent;
+  border: 1px solid var(--byrm-border, var(--byrm-line));
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  transition: color .18s, border-color .18s, background .18s, box-shadow .2s, transform .1s;
+}
+.byrm-btn:active { transform: translateY(1px); }
+
+.byrm-btn--primary {
+  position: relative;
+  color: #fff;
+  background: linear-gradient(180deg, var(--byrm-red-bright), var(--byrm-red) 55%, var(--byrm-red-deep));
+  border-color: rgba(255, 160, 120, .5);
+  box-shadow: 0 4px 18px rgba(224, 31, 31, .35);
+  overflow: hidden;
+}
+/* Shine sweep, matching the header call to action. */
+.byrm-btn--primary::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -70%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .45), transparent);
+  transform: skewX(-18deg);
+  transition: left .55s var(--byrm-ease);
+}
+.byrm-btn--primary:hover::after { left: 125%; }
+.byrm-btn--primary:hover { color: #fff; box-shadow: 0 6px 26px rgba(255, 58, 42, .5); }
+
+.byrm-btn--ghost:hover { border-color: var(--byrm-red); color: #fff; background: rgba(224, 31, 31, .1); }
+
+.byrm-btn--discord { border-color: #5865f2; color: #fff; background: rgba(88, 101, 242, .18); }
+.byrm-btn--discord:hover { background: #5865f2; color: #fff; }
+
+/* ---------------------------------------------------------------- hero ---- */
+
+.byrm-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1px solid var(--byrm-line);
+  background-color: var(--byrm-steel-900);
+}
+
+/* The featured map's artwork, used as atmosphere rather than as an image. */
+.byrm-hero.has-art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: var(--byrm-hero-art);
+  background-size: cover;
+  background-position: center;
+  filter: saturate(.55) blur(2px);
+  transform: scale(1.06);
+  opacity: .5;
+}
+
+.byrm-hero__veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(8, 11, 15, .8) 0%, rgba(8, 11, 15, .92) 60%, var(--byrm-steel-800) 100%),
+    radial-gradient(900px 420px at 18% 0%, rgba(224, 31, 31, .2), transparent 70%),
+    radial-gradient(700px 320px at 88% 10%, rgba(255, 140, 26, .1), transparent 70%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .016) 0 2px, transparent 2px 9px);
+}
+
+.byrm-hero__inner {
+  max-width: 900px;
+  margin-inline: auto;
+  padding-block: clamp(56px, 10vw, 110px);
+  text-align: center;
+}
+
+.byrm-hero__eyebrow {
+  margin: 0 0 18px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--byrm-red-bright);
+}
+
+.byrm-hero__title {
+  margin: 0 0 20px;
+  font-size: clamp(34px, 6.4vw, 68px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -.015em;
+  color: #fff;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, .6);
+}
+
+/* Second line picks up the chrome-to-red gradient from the logo. */
+.byrm-hero__title span {
+  display: block;
+  background: linear-gradient(100deg, #ffffff 0%, var(--byrm-chrome) 35%, var(--byrm-red-bright) 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.byrm-hero__lead {
+  margin: 0 auto;
+  max-width: 62ch;
+  font-size: clamp(15px, 1.6vw, 18px);
+  line-height: 1.7;
+  color: var(--byrm-chrome);
+}
+
+.byrm-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.byrm-hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(28px, 6vw, 64px);
+  margin: 46px 0 0;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255, 255, 255, .1);
+}
+.byrm-hero__stats dt {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-lo);
+}
+.byrm-hero__stats dd {
+  margin: 8px 0 0;
+  font-size: clamp(26px, 3.4vw, 38px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--byrm-red-bright);
+}
+
+/* ------------------------------------------------------------ sections ---- */
+
+.byrm-section { padding-block: clamp(40px, 6vw, 72px); }
+
+.byrm-section--featured {
+  background: var(--byrm-steel-900);
+  border-block: 1px solid var(--byrm-line);
+}
+
+.byrm-section--theaters { background: var(--byrm-steel-900); border-block: 1px solid var(--byrm-line); }
+
+.byrm-section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 28px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--byrm-line);
+  position: relative;
+}
+.byrm-section__head::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--byrm-red), var(--byrm-ember));
+}
+
+.byrm-section__head h2 {
+  margin: 0;
+  font-size: clamp(20px, 2.6vw, 27px);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+}
+
+.byrm-more { font-size: 13px; font-weight: 600; color: var(--byrm-red-bright); white-space: nowrap; }
+.byrm-more::after { content: " →"; }
+.byrm-more:hover { color: var(--byrm-ember); }
+
+/* -------------------------------------------------------- featured map ---- */
+
+.byrm-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+  gap: clamp(22px, 4vw, 48px);
+  align-items: center;
+}
+
+.byrm-feature__media {
+  display: block;
+  aspect-ratio: 1;
+  border: 1px solid var(--byrm-line);
+  background: var(--byrm-steel-800);
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .5);
+  transition: border-color .2s, transform .25s var(--byrm-ease);
+}
+.byrm-feature__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.byrm-feature:hover .byrm-feature__media { border-color: var(--byrm-red); transform: translateY(-3px); }
+
+.byrm-feature__body h3 {
+  margin: 0 0 14px;
+  font-size: clamp(24px, 3.4vw, 36px);
+  font-weight: 700;
+  line-height: 1.12;
+}
+.byrm-feature__body h3 a { color: #fff; }
+.byrm-feature__body h3 a:hover { color: var(--byrm-red-bright); }
+
+.byrm-feature__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.byrm-pill {
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome);
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+}
+.byrm-pill--key {
+  color: var(--byrm-red-bright);
+  border-color: rgba(224, 31, 31, .55);
+  background: rgba(224, 31, 31, .12);
+}
+
+.byrm-feature__summary {
+  margin: 0;
+  max-width: 58ch;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-feature__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+
+/* ----------------------------------------------------------- map cards ---- */
+
+.byrm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 18px;
+}
+
+.byrm-mcard {
+  display: flex;
+  flex-direction: column;
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  overflow: hidden;
+  transition: border-color .2s, transform .2s var(--byrm-ease), box-shadow .2s;
+}
+.byrm-mcard:hover {
+  border-color: var(--byrm-red);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, .45);
+}
+
+.byrm-mcard__media {
+  display: block;
+  aspect-ratio: 4 / 3;
+  background: var(--byrm-steel-900);
+  border-bottom: 1px solid var(--byrm-line);
+  overflow: hidden;
+}
+.byrm-mcard__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .5s var(--byrm-ease);
+}
+.byrm-mcard:hover .byrm-mcard__media img { transform: scale(1.06); }
+
+/* Stand-in pattern when a map has no featured image yet. */
+.byrm-mcard__blank {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 28px);
+}
+
+.byrm-mcard__body { display: flex; flex-direction: column; flex: 1; padding: 16px 18px 18px; }
+
+.byrm-mcard__title { margin: 0 0 8px; font-size: 17px; font-weight: 600; line-height: 1.25; }
+.byrm-mcard__title a { color: var(--byrm-chrome-hi); }
+.byrm-mcard__title a:hover { color: var(--byrm-red-bright); }
+
+.byrm-mcard__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+  font-size: 12.5px;
+  color: var(--byrm-chrome-lo);
+}
+.byrm-mcard__meta li + li::before { content: "·"; margin-right: 10px; color: var(--byrm-line); }
+
+.byrm-mcard__excerpt {
+  margin: 0 0 14px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-mcard__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 13px;
+  border-top: 1px solid var(--byrm-line);
+  font-size: 12px;
+  color: var(--byrm-chrome-lo);
+}
+.byrm-mcard__go { color: var(--byrm-red); font-size: 15px; transition: transform .2s var(--byrm-ease); }
+.byrm-mcard:hover .byrm-mcard__go { transform: translateX(4px); }
+
+/* --------------------------------------------------------- empty state ---- */
+
+.byrm-empty {
+  padding: clamp(40px, 7vw, 72px) 24px;
+  text-align: center;
+  background: var(--byrm-steel-900);
+  border: 1px dashed var(--byrm-border-strong, #3a4857);
+}
+
+.byrm-empty__mark { display: inline-flex; margin-bottom: 18px; color: var(--byrm-red); }
+.byrm-empty__mark svg {
+  width: 52px;
+  height: 52px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: .85;
+}
+
+.byrm-empty h3 {
+  margin: 0 0 12px;
+  font-size: clamp(19px, 2.4vw, 24px);
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+}
+
+.byrm-empty p {
+  margin: 0 auto 24px;
+  max-width: 54ch;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--byrm-chrome-lo);
+}
+
+/* ------------------------------------------------------------ theaters ---- */
+
+.byrm-theaters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr));
+  gap: 12px;
+}
+
+.byrm-theater {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 18px;
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  border-left: 2px solid var(--byrm-red);
+  transition: background .18s, border-color .18s, transform .18s;
+}
+.byrm-theater:hover { background: var(--byrm-steel-600); transform: translateY(-2px); }
+
+.byrm-theater__name {
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+}
+.byrm-theater__count { font-size: 12px; color: var(--byrm-chrome-lo); }
+
+/* -------------------------------------------------------------- panels ---- */
+
+.byrm-section--split { background: var(--byrm-steel-900); border-top: 1px solid var(--byrm-line); }
+
+.byrm-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  gap: 18px;
+}
+
+.byrm-panel {
+  padding: clamp(24px, 3.4vw, 36px);
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  border-left: 3px solid var(--byrm-red);
+}
+.byrm-panel--community { border-left-color: #5865f2; }
+
+.byrm-panel h2 {
+  margin: 0 0 12px;
+  font-size: clamp(19px, 2.2vw, 23px);
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+}
+
+.byrm-panel p {
+  margin: 0 0 22px;
+  max-width: 52ch;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--byrm-chrome-lo);
+}
+
+/* ---------------------------------------------------------- responsive ---- */
+
+@media (max-width: 860px) {
+  .byrm-feature { grid-template-columns: 1fr; }
+  .byrm-feature__media { max-width: 420px; }
+}
+
+@media (max-width: 600px) {
+  .byrm-home__shell { padding-inline: 14px; }
+  .byrm-hero__actions .byrm-btn { flex: 1 1 auto; }
+  .byrm-hero__stats { gap: 24px; }
+  .byrm-grid { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------- accessibility ---- */
+
+.byrm-home :focus-visible {
+  outline: 2px solid var(--byrm-ember);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .byrm-home *,
+  .byrm-home *::before,
+  .byrm-home *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}

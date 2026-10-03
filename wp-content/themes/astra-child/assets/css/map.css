@@ -1,0 +1,694 @@
+/* ==========================================================================
+   Bank of YR Maps — single map page
+   Tokens come from header.css; this file adds only what the map page needs.
+   ========================================================================== */
+
+.byrm-map {
+  font-family: var(--byrm-font);
+  color: var(--byrm-chrome);
+  background: var(--byrm-steel-800);
+}
+
+.byrm-map *,
+.byrm-map *::before,
+.byrm-map *::after { box-sizing: border-box; }
+
+.byrm-map a { text-decoration: none; }
+
+.byrm-map__shell {
+  width: 100%;
+  max-width: var(--byrm-shell);
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+/* -------------------------------------------------------------- banner ---- */
+
+.byrm-mbanner {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1px solid var(--byrm-line);
+  /* The shared artwork, when one is configured. */
+  background-image: var(--byrm-banner-image, none);
+  background-size: cover;
+  background-position: center;
+  background-color: var(--byrm-steel-900);
+}
+
+/* Readability veil plus the house pattern, so the same banner works behind
+   every map title regardless of the artwork behind it. */
+.byrm-mbanner__veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(8, 11, 15, .82), rgba(8, 11, 15, .94)),
+    radial-gradient(760px 300px at 12% 0%, rgba(224, 31, 31, .22), transparent 70%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .02) 0 2px, transparent 2px 9px);
+}
+
+.byrm-mbanner__inner { padding-block: clamp(30px, 5vw, 56px) clamp(26px, 4vw, 40px); }
+
+.byrm-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12.5px;
+  letter-spacing: .04em;
+  color: var(--byrm-chrome-lo);
+  margin-bottom: 16px;
+}
+.byrm-crumbs a { color: var(--byrm-chrome-lo); }
+.byrm-crumbs a:hover { color: var(--byrm-red-bright); }
+.byrm-crumbs span[aria-hidden] { color: var(--byrm-line); }
+
+.byrm-mbanner__title {
+  margin: 0 0 16px;
+  font-size: clamp(30px, 5.2vw, 52px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -.01em;
+  color: #fff;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, .6);
+}
+
+.byrm-mpills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.byrm-pill {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome);
+  background: rgba(20, 26, 34, .8);
+  border: 1px solid var(--byrm-line);
+}
+.byrm-pill--key {
+  color: var(--byrm-red-bright);
+  border-color: rgba(224, 31, 31, .6);
+  background: rgba(224, 31, 31, .12);
+}
+
+.byrm-mbanner__by { margin: 0; font-size: 13.5px; color: var(--byrm-chrome-lo); }
+.byrm-mbanner__by strong { color: var(--byrm-chrome-hi); font-weight: 600; }
+
+/* -------------------------------------------------------------- layout ---- */
+
+.byrm-map__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: clamp(24px, 3.5vw, 48px);
+  align-items: start;
+  padding-block: clamp(28px, 4vw, 48px);
+}
+
+/* ------------------------------------------------------------ gallery ---- */
+
+/* Flex rather than grid, on purpose.
+   A fixed-column grid leaves a hole whenever the image count does not divide
+   evenly into the columns — a single screenshot filled two of three columns and
+   left a third of the row empty, and 4, 5 and 7 images left trailing gaps too.
+   Wrapping flex items grow to fill whatever is left on their row, so every
+   count fills the width exactly. */
+.byrm-shots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+/* Frames grow to share out whatever is left on their row, so a row of three and
+   a row of two both finish flush with the right edge. The cap stops a lone
+   left-over frame ballooning to the width of the hero above it; a single
+   left-over lands at half width, centred, which reads as deliberate rather
+   than as a hole. */
+.byrm-shot {
+  flex: 1 1 230px;
+  max-width: calc(50% - 7px);
+  aspect-ratio: 16 / 9;
+}
+
+/* The first image is the hero: its own full-width row, every time. */
+.byrm-shot--lead { flex: 1 1 100%; max-width: 100%; }
+
+.byrm-shot {
+  position: relative;
+  display: block;
+  border: 1px solid var(--byrm-line);
+  background: var(--byrm-steel-900);
+  overflow: hidden;
+  transition: border-color .2s, box-shadow .2s, transform .2s var(--byrm-ease);
+}
+
+.byrm-shot:hover,
+.byrm-shot:focus-visible {
+  border-color: var(--byrm-red);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, .5), 0 0 0 1px rgba(224, 31, 31, .35);
+  transform: translateY(-2px);
+  z-index: 2;
+}
+
+/* The frame clips the image, so magnifying happens inside it and the row
+   never reflows. */
+.byrm-shot__frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  height: 100%;
+}
+
+.byrm-shot__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* transform-origin is set from the cursor position by map.js. */
+  transform: scale(1);
+  transition: transform .45s var(--byrm-ease);
+  will-change: transform;
+}
+
+.byrm-shot:hover .byrm-shot__img,
+.byrm-shot:focus-visible .byrm-shot__img { transform: scale(1.9); }
+
+/* A faint sheen that sweeps across on hover. */
+.byrm-shot__glass {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, .1) 50%, transparent 62%);
+  opacity: 0;
+  transform: translateX(-60%);
+  transition: opacity .3s, transform .7s var(--byrm-ease);
+  pointer-events: none;
+}
+.byrm-shot:hover .byrm-shot__glass { opacity: 1; transform: translateX(60%); }
+
+.byrm-shot__badge {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  background: rgba(8, 11, 15, .82);
+  border: 1px solid var(--byrm-line);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .22s, transform .22s var(--byrm-ease), border-color .22s;
+  pointer-events: none;
+}
+.byrm-shot__badge svg { width: 17px; height: 17px; fill: none; stroke: var(--byrm-chrome-hi); stroke-width: 2; stroke-linecap: round; }
+.byrm-shot:hover .byrm-shot__badge,
+.byrm-shot:focus-visible .byrm-shot__badge {
+  opacity: 1;
+  transform: translateY(0);
+  border-color: var(--byrm-red);
+}
+
+.byrm-shot__tag {
+  position: absolute;
+  left: 0;
+  top: 12px;
+  padding: 4px 12px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(90deg, var(--byrm-red), var(--byrm-red-deep));
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.byrm-shots__hint {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  letter-spacing: .04em;
+  color: var(--byrm-chrome-lo);
+  text-align: center;
+}
+
+/* --------------------------------------------------------- text blocks ---- */
+
+.byrm-mblock { margin-top: clamp(32px, 4vw, 52px); }
+
+.byrm-mblock > h2 {
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  font-size: clamp(19px, 2.2vw, 24px);
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+  border-bottom: 1px solid var(--byrm-line);
+  position: relative;
+}
+.byrm-mblock > h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 54px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--byrm-red), var(--byrm-ember));
+}
+
+.byrm-prose { max-width: 72ch; font-size: 15.5px; line-height: 1.75; color: var(--byrm-chrome); }
+.byrm-prose p { margin: 0 0 1.1em; }
+.byrm-prose strong { color: var(--byrm-chrome-hi); }
+.byrm-prose a { color: var(--byrm-red-bright); border-bottom: 1px solid rgba(224, 31, 31, .4); }
+.byrm-prose a:hover { border-bottom-color: currentColor; }
+.byrm-prose ul, .byrm-prose ol { padding-left: 1.3em; margin: 0 0 1.1em; }
+.byrm-prose li { margin-bottom: .45em; }
+.byrm-prose h3 { margin: 1.6em 0 .5em; font-size: 17px; color: var(--byrm-chrome-hi); }
+.byrm-prose img { max-width: 100%; height: auto; border: 1px solid var(--byrm-line); }
+.byrm-prose blockquote {
+  margin: 1.4em 0;
+  padding: 2px 0 2px 18px;
+  border-left: 3px solid var(--byrm-red);
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-arrow { color: var(--byrm-red-bright); font-weight: 600; font-size: 14px; }
+.byrm-arrow::after { content: " →"; }
+.byrm-arrow:hover { color: var(--byrm-ember); }
+
+.byrm-tagcloud { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.byrm-tag {
+  padding: 6px 13px;
+  font-size: 13px;
+  color: var(--byrm-chrome-lo);
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  border-radius: 999px;
+  transition: color .18s, border-color .18s;
+}
+.byrm-tag:hover { color: var(--byrm-chrome-hi); border-color: var(--byrm-red); }
+
+/* ------------------------------------------------------------- sidebar ---- */
+
+.byrm-aside__sticky {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.byrm-dl {
+  position: relative;
+  padding: 22px;
+  background: linear-gradient(180deg, var(--byrm-steel-700), var(--byrm-steel-800));
+  border: 1px solid var(--byrm-line);
+  border-top: 3px solid var(--byrm-red);
+  overflow: hidden;
+}
+
+/* Hazard shading in the corner, echoing the footer call to action. */
+.byrm-dl::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 40%;
+  background: repeating-linear-gradient(135deg, rgba(224, 31, 31, .06) 0 9px, transparent 9px 18px);
+  mask-image: linear-gradient(90deg, transparent, #000);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000);
+  pointer-events: none;
+}
+
+.byrm-dl__eyebrow {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-dl__btn {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(180deg, var(--byrm-red-bright), var(--byrm-red) 55%, var(--byrm-red-deep));
+  border: 1px solid rgba(255, 160, 120, .5);
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  box-shadow: 0 4px 18px rgba(224, 31, 31, .4);
+  transition: box-shadow .2s, transform .1s;
+}
+.byrm-dl__btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; }
+.byrm-dl__btn:hover { box-shadow: 0 6px 26px rgba(255, 58, 42, .55); color: #fff; }
+.byrm-dl__btn:active { transform: translateY(1px); }
+
+.byrm-dl__facts {
+  position: relative;
+  z-index: 1;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+.byrm-dl__facts li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--byrm-line);
+}
+.byrm-dl__facts li:last-child { border-bottom: 0; }
+.byrm-dl__facts span { color: var(--byrm-chrome-lo); }
+.byrm-dl__facts strong { color: var(--byrm-chrome-hi); font-weight: 600; }
+.byrm-ok { color: #4ade80 !important; }
+
+.byrm-dl__empty { margin: 0; font-size: 13.5px; color: var(--byrm-chrome-lo); }
+
+/* Names the third-party host the download button leads to. */
+.byrm-dl__host {
+  position: relative;
+  z-index: 1;
+  margin: 12px 0 0;
+  font-size: 12px;
+  letter-spacing: .04em;
+  color: var(--byrm-chrome-lo);
+}
+.byrm-dl__host strong { color: var(--byrm-chrome); font-weight: 600; }
+
+.byrm-specs, .byrm-aside__note {
+  padding: 20px;
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+}
+
+.byrm-specs h2, .byrm-aside__note h2 {
+  margin: 0 0 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-specs__list { margin: 0; font-size: 13.5px; }
+.byrm-specs__list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--byrm-line);
+}
+.byrm-specs__list > div:last-child { border-bottom: 0; }
+.byrm-specs__list dt { color: var(--byrm-chrome-lo); }
+.byrm-specs__list dd { margin: 0; text-align: right; font-weight: 600; color: var(--byrm-chrome-hi); }
+
+.byrm-aside__note { border-left: 2px solid var(--byrm-red); }
+.byrm-aside__note p { margin: 0 0 12px; font-size: 13.5px; line-height: 1.65; color: var(--byrm-chrome-lo); }
+
+/* ------------------------------------------------------------- related ---- */
+
+.byrm-related {
+  padding-block: clamp(32px, 4vw, 52px);
+  background: var(--byrm-steel-900);
+  border-top: 1px solid var(--byrm-line);
+}
+
+.byrm-related__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--byrm-line);
+}
+.byrm-related__head h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+}
+
+.byrm-related__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: 16px;
+}
+
+.byrm-rcard {
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  overflow: hidden;
+  transition: border-color .2s, transform .2s;
+}
+.byrm-rcard:hover { border-color: var(--byrm-red); transform: translateY(-2px); }
+
+.byrm-rcard__media { display: block; aspect-ratio: 4 / 3; background: var(--byrm-steel-900); }
+.byrm-rcard__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.byrm-rcard__blank {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 1px, transparent 1px 26px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 26px);
+}
+
+.byrm-rcard__body { padding: 14px 16px 16px; }
+.byrm-rcard__body h3 { margin: 0 0 6px; font-size: 15.5px; font-weight: 600; }
+.byrm-rcard__body h3 a { color: var(--byrm-chrome-hi); }
+.byrm-rcard__body h3 a:hover { color: var(--byrm-red-bright); }
+.byrm-rcard__meta { margin: 0; font-size: 12.5px; color: var(--byrm-chrome-lo); }
+
+/* ------------------------------------------------------------ lightbox ---- */
+
+.byrm-lb {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 72px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "bar bar bar"
+    "prev stage next"
+    "strip strip strip";
+  font-family: var(--byrm-font);
+  opacity: 0;
+  transition: opacity .25s var(--byrm-ease);
+}
+.byrm-lb[hidden] { display: none; }
+.byrm-lb.is-open { opacity: 1; }
+
+.byrm-lb__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(4, 6, 9, .93);
+  backdrop-filter: blur(8px);
+}
+
+.byrm-lb__bar {
+  grid-area: bar;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+.byrm-lb__count {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  color: var(--byrm-red-bright);
+  flex: 0 0 auto;
+}
+
+.byrm-lb__title {
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-lo);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.byrm-lb__tools { display: flex; gap: 8px; flex: 0 0 auto; }
+
+.byrm-lb__btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, .14);
+  color: var(--byrm-chrome);
+  cursor: pointer;
+  transition: border-color .18s, color .18s, background .18s;
+}
+.byrm-lb__btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.byrm-lb__btn:hover { border-color: var(--byrm-red); color: #fff; background: rgba(224, 31, 31, .14); }
+.byrm-lb__btn[aria-pressed="true"] { border-color: var(--byrm-red); color: #fff; background: rgba(224, 31, 31, .2); }
+
+.byrm-lb__nav {
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--byrm-chrome-lo);
+  cursor: pointer;
+  transition: color .18s;
+}
+.byrm-lb__nav--prev { grid-area: prev; }
+.byrm-lb__nav--next { grid-area: next; }
+.byrm-lb__nav svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.byrm-lb__nav:hover { color: #fff; }
+.byrm-lb__nav[disabled] { opacity: .22; cursor: default; }
+
+.byrm-lb__stage {
+  grid-area: stage;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.byrm-lb__img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border: 1px solid rgba(255, 255, 255, .1);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .7);
+  cursor: zoom-in;
+  transition: opacity .2s;
+}
+
+/* Full-resolution inspect mode: the image is shown at native size and panned
+   with the pointer, which is the point of shipping ultra-high-res artwork. */
+.byrm-lb.is-zoomed .byrm-lb__stage { overflow: hidden; }
+.byrm-lb.is-zoomed .byrm-lb__img {
+  max-width: none;
+  max-height: none;
+  cursor: zoom-out;
+}
+.byrm-lb.is-zoomed .byrm-lb__caption { display: none; }
+
+.byrm-lb__img.is-loading { opacity: .25; }
+
+.byrm-lb__caption {
+  max-width: 78ch;
+  padding-inline: 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--byrm-chrome-lo);
+}
+.byrm-lb__caption:empty { display: none; }
+
+.byrm-lb__strip {
+  grid-area: strip;
+  display: flex;
+  gap: 8px;
+  padding: 12px 18px;
+  overflow-x: auto;
+  border-top: 1px solid rgba(255, 255, 255, .08);
+  scrollbar-width: thin;
+}
+.byrm-lb__strip:empty { display: none; }
+
+.byrm-lb__thumb {
+  flex: 0 0 auto;
+  width: 96px;
+  height: 64px;
+  padding: 0;
+  background: var(--byrm-steel-800);
+  border: 1px solid rgba(255, 255, 255, .12);
+  cursor: pointer;
+  opacity: .5;
+  transition: opacity .18s, border-color .18s;
+}
+.byrm-lb__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.byrm-lb__thumb:hover { opacity: .85; }
+.byrm-lb__thumb.is-current { opacity: 1; border-color: var(--byrm-red); }
+
+/* ---------------------------------------------------------- responsive ---- */
+
+@media (max-width: 1080px) {
+  .byrm-map__layout { grid-template-columns: minmax(0, 1fr) 300px; }
+}
+
+@media (max-width: 900px) {
+  .byrm-map__layout { grid-template-columns: 1fr; }
+  .byrm-aside__sticky { position: static; }
+}
+
+@media (max-width: 680px) {
+  .byrm-shots { gap: 10px; }
+  /* Two across at this width: a third column would make each frame too small
+     to read anything in. */
+  .byrm-shot { flex-basis: calc(50% - 5px); }
+  .byrm-shot:hover .byrm-shot__img { transform: scale(1.5); }
+
+  .byrm-lb { grid-template-columns: 52px minmax(0, 1fr) 52px; }
+  .byrm-lb__nav svg { width: 26px; height: 26px; }
+  .byrm-lb__thumb { width: 72px; height: 50px; }
+  .byrm-lb__title { display: none; }
+}
+
+@media (max-width: 480px) {
+  .byrm-map__shell { padding-inline: 14px; }
+  /* One per row on a phone, so the cap has to lift with it. */
+  .byrm-shot { flex-basis: 100%; max-width: 100%; }
+}
+
+/* ------------------------------------------------------- accessibility ---- */
+
+.byrm-map :focus-visible,
+.byrm-lb :focus-visible {
+  outline: 2px solid var(--byrm-ember);
+  outline-offset: 3px;
+}
+
+/* Scrolling is locked while the viewer is open. */
+body.byrm-lb-open { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .byrm-shot:hover .byrm-shot__img,
+  .byrm-shot:focus-visible .byrm-shot__img { transform: scale(1.18); }
+  .byrm-map *, .byrm-lb *,
+  .byrm-map *::before, .byrm-lb *::before {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}

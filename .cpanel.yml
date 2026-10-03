@@ -1,0 +1,11 @@
+---
+deployment:
+  tasks:
+    # cPanel's Git Version Control runs this after "Deploy HEAD Commit".
+    # DEPLOYPATH is where the repository was cloned; only the theme and the
+    # plugin are copied out of it, so nothing else on the account is touched.
+    - export DEPLOYPATH=/home/$(whoami)/public_html
+    - /bin/mkdir -p $DEPLOYPATH/wp-content/themes/astra-child
+    - /bin/mkdir -p $DEPLOYPATH/wp-content/plugins/byrm-maps
+    - /bin/cp -R wp-content/themes/astra-child/. $DEPLOYPATH/wp-content/themes/astra-child/
+    - /bin/cp -R wp-content/plugins/byrm-maps/. $DEPLOYPATH/wp-content/plugins/byrm-maps/

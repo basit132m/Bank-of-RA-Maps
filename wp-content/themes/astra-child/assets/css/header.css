@@ -204,11 +204,22 @@
   line-height: 0;
 }
 
-.byrm-logo img,
-.byrm-logo .custom-logo {
-  width: auto;
-  height: 66px;
-  max-width: none;
+/* A Customizer logo arrives wrapped in Astra's own .custom-logo-link. */
+.byrm-logo .custom-logo-link {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+}
+
+/* !important because Astra generates inline CSS from the Customizer "Logo
+   Width" setting, which otherwise wins over anything declared in this file. */
+.byrm-header .byrm-logo img,
+.byrm-header .byrm-logo .custom-logo {
+  width: auto !important;
+  height: 66px !important;
+  max-width: none !important;
   /* A grounded drop shadow and a faint red bloom, so the artwork sits in the
      bar instead of floating on top of it. */
   filter:
@@ -466,7 +477,7 @@
 .byrm-header.is-stuck .byrm-strip { height: 0; opacity: 0; border-bottom-color: transparent; }
 .byrm-header.is-stuck .byrm-bar__inner { height: var(--byrm-bar-h-stuck); }
 .byrm-header.is-stuck .byrm-logo img,
-.byrm-header.is-stuck .byrm-logo .custom-logo { height: 46px; }
+.byrm-header.is-stuck .byrm-logo .custom-logo { height: 46px !important; }
 .byrm-header.is-stuck { box-shadow: 0 10px 34px rgba(0, 0, 0, .55); }
 
 /* ----------------------------------------------------------- responsive ---- */
@@ -484,10 +495,10 @@
      submit button both keep their own display. */
   .byrm-bar .byrm-cta { display: none; }
 
-  .byrm-logo img,
-  .byrm-logo .custom-logo { height: 46px; }
+  .byrm-header .byrm-logo img,
+  .byrm-header .byrm-logo .custom-logo { height: 46px !important; }
   .byrm-header.is-stuck .byrm-logo img,
-  .byrm-header.is-stuck .byrm-logo .custom-logo { height: 38px; }
+  .byrm-header.is-stuck .byrm-logo .custom-logo { height: 38px !important; }
 
   /* Menu becomes a panel that starts below the header, so the logo and the
      close button stay visible and clickable. --byrm-header-h is published by
@@ -556,10 +567,10 @@
   .byrm-header__shell { padding-inline: 14px; }
   .byrm-strip__status { letter-spacing: .08em; font-size: 10.5px; }
   .byrm-strip__links a:not(.byrm-strip__discord) { display: none; }
-  .byrm-logo img,
-  .byrm-logo .custom-logo { height: 34px; }
+  .byrm-header .byrm-logo img,
+  .byrm-header .byrm-logo .custom-logo { height: 34px !important; }
   .byrm-header.is-stuck .byrm-logo img,
-  .byrm-header.is-stuck .byrm-logo .custom-logo { height: 30px; }
+  .byrm-header.is-stuck .byrm-logo .custom-logo { height: 30px !important; }
 }
 
 /* ------------------------------------------------------- accessibility ---- */
@@ -601,3 +612,4 @@
     animation-iteration-count: 1 !important;
   }
 }
+

@@ -1,0 +1,349 @@
+/* ==========================================================================
+   Bank of YR Maps — map tweaker
+   Tokens come from header.css; buttons come from home.css. Both load with it.
+   ========================================================================== */
+
+.byrm-tool {
+  font-family: var(--byrm-font);
+  color: var(--byrm-chrome);
+  background: var(--byrm-steel-800);
+}
+
+.byrm-tool *,
+.byrm-tool *::before,
+.byrm-tool *::after { box-sizing: border-box; }
+
+.byrm-tool a { text-decoration: none; }
+.byrm-tool a:not(.byrm-btn) { color: var(--byrm-red-bright); }
+.byrm-tool a:not(.byrm-btn):hover { color: var(--byrm-ember); }
+
+.byrm-tool__shell {
+  width: 100%;
+  max-width: 980px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+.byrm-tool__body { padding-block: clamp(30px, 4.4vw, 54px) clamp(44px, 6vw, 80px); }
+
+/* ============================================================== banner ==== */
+
+.byrm-tbanner {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1px solid var(--byrm-line);
+  background-color: var(--byrm-steel-900);
+}
+
+.byrm-tbanner__veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(780px 320px at 20% 0%, rgba(224, 31, 31, .2), transparent 70%),
+    radial-gradient(540px 260px at 90% 110%, rgba(255, 140, 26, .12), transparent 72%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .018) 0 2px, transparent 2px 9px);
+}
+
+.byrm-tbanner__inner { padding-block: clamp(28px, 4.4vw, 50px) clamp(26px, 4vw, 40px); }
+
+.byrm-tcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 12.5px;
+  letter-spacing: .04em;
+  color: var(--byrm-chrome-lo);
+}
+.byrm-tool .byrm-tcrumbs a { color: var(--byrm-chrome-lo); }
+.byrm-tool .byrm-tcrumbs a:hover { color: var(--byrm-chrome-hi); }
+.byrm-tcrumbs [aria-current] { color: var(--byrm-chrome); }
+
+.byrm-tbanner__eyebrow {
+  margin: 0 0 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--byrm-red-bright);
+}
+
+.byrm-tbanner__title {
+  margin: 0 0 12px;
+  font-size: clamp(28px, 5vw, 46px);
+  font-weight: 700;
+  line-height: 1.06;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+}
+
+.byrm-tbanner__lead {
+  max-width: 62ch;
+  margin: 0;
+  font-size: clamp(15px, 1.5vw, 17px);
+  line-height: 1.65;
+  color: var(--byrm-chrome);
+}
+
+/* =============================================================== error ==== */
+
+.byrm-terror {
+  margin: 0 0 26px;
+  padding: 14px 18px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #ffd9d4;
+  background: rgba(224, 31, 31, .14);
+  border: 1px solid rgba(255, 58, 42, .45);
+  border-left: 3px solid var(--byrm-red-bright);
+}
+.byrm-terror strong { color: #fff; }
+
+/* =============================================================== steps ==== */
+
+.byrm-tstep {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 18px;
+  margin-bottom: clamp(28px, 4vw, 42px);
+}
+
+.byrm-tstep__num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  font-size: 19px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(180deg, var(--byrm-red-bright), var(--byrm-red-deep));
+  border: 1px solid rgba(255, 160, 120, .4);
+}
+
+.byrm-tstep__title {
+  margin: 6px 0 6px;
+  font-size: clamp(17px, 2.1vw, 21px);
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+}
+
+.byrm-tstep__note {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--byrm-chrome-lo);
+}
+
+/* ========================================================== file picker === */
+
+.byrm-tdrop {
+  position: relative;
+  background: var(--byrm-steel-700);
+  border: 1px dashed var(--byrm-line);
+  transition: border-color .18s, background .18s;
+}
+.byrm-tdrop.is-dragging { border-color: var(--byrm-red); background: rgba(224, 31, 31, .08); }
+.byrm-tdrop.has-file { border-style: solid; border-color: var(--byrm-red); }
+
+/* The real input sits on top of the face, invisible but still the thing you
+   click and tab to — so the keyboard and screen-reader behaviour is the
+   browser's own, not a reimplementation of it. */
+.byrm-tdrop__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.byrm-tdrop__face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: clamp(26px, 4vw, 40px) 20px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.byrm-tdrop__icon { color: var(--byrm-red-bright); }
+.byrm-tdrop__icon svg {
+  width: 32px;
+  height: 32px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+.byrm-tdrop__label {
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+  overflow-wrap: anywhere;
+}
+
+.byrm-tdrop__input:focus-visible + .byrm-tdrop__face {
+  outline: 2px solid var(--byrm-ember);
+  outline-offset: -4px;
+}
+
+/* ============================================================= options ==== */
+
+.byrm-topts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 12px;
+}
+
+.byrm-topt {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 13px;
+  padding: 16px 18px;
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  border-left: 2px solid var(--byrm-line);
+  cursor: pointer;
+  transition: border-color .16s, background .16s;
+}
+.byrm-topt:hover { border-left-color: var(--byrm-red); }
+.byrm-topt:has(.byrm-topt__box:checked) {
+  border-color: var(--byrm-red);
+  background: rgba(224, 31, 31, .09);
+}
+
+.byrm-topt__box { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--byrm-red); }
+.byrm-topt__box:focus-visible { outline: 2px solid var(--byrm-ember); outline-offset: 2px; }
+
+.byrm-topt__text { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+
+.byrm-topt__label {
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+}
+
+.byrm-topt__note {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--byrm-chrome-lo);
+}
+
+/* ============================================================== submit ==== */
+
+.byrm-tgo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.byrm-tool .byrm-tgo__submit { cursor: pointer; }
+.byrm-tool .byrm-tgo__submit[disabled] { opacity: .55; cursor: not-allowed; }
+
+.byrm-tgo__count {
+  font-size: 12.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-lo);
+}
+
+/* ======================================================== worth knowing === */
+
+.byrm-tfacts {
+  margin-top: clamp(16px, 3vw, 28px);
+  padding-top: clamp(26px, 4vw, 38px);
+  border-top: 1px solid var(--byrm-line);
+}
+
+.byrm-tfacts__title {
+  margin: 0 0 20px;
+  font-size: clamp(17px, 2.1vw, 21px);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+}
+
+.byrm-tfact { margin-bottom: 20px; }
+.byrm-tfact:last-child { margin-bottom: 0; }
+
+.byrm-tfact h3 {
+  margin: 0 0 6px;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+}
+
+.byrm-tfact p {
+  max-width: 72ch;
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--byrm-chrome-lo);
+}
+
+/* =============================================================== prose ==== */
+
+.byrm-tnote {
+  margin-top: clamp(28px, 4vw, 40px);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--byrm-chrome);
+}
+.byrm-tnote > :first-child { margin-top: 0; }
+.byrm-tnote > :last-child { margin-bottom: 0; }
+
+/* ================================================================= cta ==== */
+
+.byrm-tcta {
+  margin-top: clamp(30px, 4.4vw, 46px);
+  padding: clamp(24px, 3.4vw, 34px);
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  border-left: 3px solid var(--byrm-red);
+}
+
+.byrm-tcta h2 {
+  margin: 0 0 10px;
+  font-size: clamp(19px, 2.2vw, 23px);
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-hi);
+}
+
+.byrm-tcta p { margin: 0 0 20px; font-size: 15px; color: var(--byrm-chrome-lo); }
+
+/* ========================================================== responsive === */
+
+@media (max-width: 600px) {
+  .byrm-tool__shell { padding-inline: 14px; }
+  .byrm-tstep { grid-template-columns: 38px minmax(0, 1fr); gap: 13px; }
+  .byrm-tstep__num { width: 36px; height: 36px; font-size: 16px; }
+  .byrm-tgo__submit { flex: 1 1 auto; }
+}
+
+/* ======================================================= accessibility === */
+
+.byrm-tool :focus-visible {
+  outline: 2px solid var(--byrm-ember);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .byrm-tdrop,
+  .byrm-topt { transition: none; }
+}

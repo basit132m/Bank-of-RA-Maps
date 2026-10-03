@@ -31,8 +31,20 @@ function get_stylesheet_directory_uri(): string { return THEME_URI; }
 function get_bloginfo(string $show = '', string $filter = ''): string { return 'Bank of YR Maps'; }
 function get_search_query(): string { return ''; }
 
-function has_custom_logo(): bool { return false; }
-function the_custom_logo(): void {}
+// ?customlogo=1 reproduces a WordPress Customizer logo, which renders its own
+// <a class="custom-logo-link"> wrapper and carries Astra's sizing CSS.
+function has_custom_logo(): bool { return isset($_GET['customlogo']); }
+function post_type_exists(string $type): bool { return isset($_GET['stats']); }
+function wp_count_posts(string $type): object { return (object) ['publish' => (int) ($_GET['stats'] ?? 0)]; }
+function number_format_i18n(int $n): string { return number_format($n); }
+function the_custom_logo(): void
+{
+    printf(
+        '<a href="/" class="custom-logo-link" rel="home"><img src="%s" class="custom-logo"'
+        . ' alt="Bank of YR Maps" width="2000" height="668"></a>',
+        THEME_URI . '/assets/img/logo.webp'
+    );
+}
 function has_nav_menu(string $location): bool { return false; }
 function wp_nav_menu(array $args = []): void {}
 
@@ -46,10 +58,17 @@ function apply_filters(string $hook, mixed $value): mixed
         $value['cta_label']   = 'Browse maps';
     }
 
+    if ($hook === 'byrm_footer_config' && is_array($value)) {
+        // Mirrors byrm_footer_settings() in functions.php.
+        $value['discord_url']   = $_GET['discord'] ?? 'https://discord.gg/example';
+        $value['contact_email'] = 'hello@bankofyrmaps.com';
+    }
+
     return $value;
 }
 
 require dirname(__DIR__, 2) . '/wp-content/themes/astra-child/inc/site-header.php';
+require dirname(__DIR__, 2) . '/wp-content/themes/astra-child/inc/site-footer.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,6 +77,14 @@ require dirname(__DIR__, 2) . '/wp-content/themes/astra-child/inc/site-header.ph
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Header preview — Bank of YR Maps</title>
 <link rel="stylesheet" href="<?= THEME_URI ?>/assets/css/header.css">
+<link rel="stylesheet" href="<?= THEME_URI ?>/assets/css/footer.css">
+<?php if (isset($_GET['customlogo'])): ?>
+<style id="fake-astra-logo-css">
+  /* Stands in for the inline CSS Astra generates from the Customizer logo
+     width, which is what our own rules have to beat. */
+  .custom-logo-link img { max-width: 305px; height: auto; }
+</style>
+<?php endif; ?>
 <style>
   /* Stand-in for the page body, so scroll behaviour can be checked. */
   body { margin: 0; background: #0d1117; color: #c3ced8;
@@ -81,6 +108,9 @@ require dirname(__DIR__, 2) . '/wp-content/themes/astra-child/inc/site-header.ph
   <div class="demo__filler">page content</div>
 </main>
 
+<?php byrm_render_site_footer(); ?>
+
 <script src="<?= THEME_URI ?>/assets/js/header.js" defer></script>
+<script src="<?= THEME_URI ?>/assets/js/footer.js" defer></script>
 </body>
 </html>
