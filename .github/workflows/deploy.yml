@@ -37,7 +37,23 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
 
+      - name: Stop here if the secrets are not set up yet
+        id: gate
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          # Until the four secrets exist this cannot do anything, and a red
+          # cross on every push while that is still being set up is only
+          # confusing. Say what is missing and finish green instead.
+          if [ -z "$DEPLOY_HOST" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Deploy skipped — DEPLOY_HOST is not set. See tools/deploy/README.md for the one-time setup."
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Load the deploy key
+        if: steps.gate.outputs.ready == 'true'
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -52,6 +68,7 @@ jobs:
           ssh-keyscan -p "${DEPLOY_PORT:-21098}" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Deploy the theme and plugins
+        if: steps.gate.outputs.ready == 'true'
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
