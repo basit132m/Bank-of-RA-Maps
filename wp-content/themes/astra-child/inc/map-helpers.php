@@ -194,3 +194,18 @@ function byrm_render_lightbox() {
 	<?php
 }
 add_action( 'wp_footer', 'byrm_render_lightbox' );
+
+/**
+ * Is this the pause between the download button and the file?
+ *
+ * The plugin routes /map-download/{id}/ here by query var rather than through
+ * the template hierarchy, so there is no is_page() to ask. The /go/ step never
+ * renders anything — it counts and redirects — so it is excluded.
+ *
+ * @return bool
+ */
+function byrm_is_download_page() {
+	return did_action( 'parse_query' )
+		&& (bool) get_query_var( 'byrm_map_download' )
+		&& ! get_query_var( 'byrm_map_download_go' );
+}

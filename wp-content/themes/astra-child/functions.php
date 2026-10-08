@@ -204,6 +204,43 @@ function byrm_enqueue_assets() {
 		);
 	}
 
+	// The download wait page: map cards from home.css, the banner and blocks
+	// from guide.css, then the countdown itself.
+	if ( byrm_is_download_page() ) {
+		$home_css = $dir . '/assets/css/home.css';
+		wp_enqueue_style(
+			'byrm-home',
+			$uri . '/assets/css/home.css',
+			array( 'byrm-header' ),
+			file_exists( $home_css ) ? (string) filemtime( $home_css ) : BYRM_CHILD_VERSION
+		);
+
+		$guide_css = $dir . '/assets/css/guide.css';
+		wp_enqueue_style(
+			'byrm-guide',
+			$uri . '/assets/css/guide.css',
+			array( 'byrm-home' ),
+			file_exists( $guide_css ) ? (string) filemtime( $guide_css ) : BYRM_CHILD_VERSION
+		);
+
+		$download_css = $dir . '/assets/css/download.css';
+		wp_enqueue_style(
+			'byrm-download',
+			$uri . '/assets/css/download.css',
+			array( 'byrm-guide' ),
+			file_exists( $download_css ) ? (string) filemtime( $download_css ) : BYRM_CHILD_VERSION
+		);
+
+		$download_js = $dir . '/assets/js/download.js';
+		wp_enqueue_script(
+			'byrm-download',
+			$uri . '/assets/js/download.js',
+			array(),
+			file_exists( $download_js ) ? (string) filemtime( $download_js ) : BYRM_CHILD_VERSION,
+			true
+		);
+	}
+
 	// The About page borrows the guide section's banner, blocks and panels, then
 	// adds its own figures strip and fact list on top.
 	if ( byrm_is_about_page() ) {
@@ -487,6 +524,7 @@ function byrm_is_full_width_template() {
 		|| byrm_is_community_page()
 		|| byrm_is_tweaker_page()
 		|| byrm_is_about_page()
+		|| byrm_is_download_page()
 		|| is_search();
 }
 

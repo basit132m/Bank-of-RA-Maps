@@ -1,0 +1,227 @@
+/* ============================================================================
+ * Download wait page
+ *
+ * Loaded after home.css (map cards) and guide.css (banner, blocks, notes), so
+ * this file holds only the countdown and the panel around it. Class names are
+ * prefixed byrm-dlwait- and byrm-dlring-, neither of which appears in any other
+ * stylesheet.
+ *
+ * .byrm-arrow is redefined here, scoped to this page, rather than pulling in
+ * the whole of map.css for three lines.
+ * ========================================================================= */
+
+.byrm-dlwait__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.byrm-dlwait .byrm-arrow { color: var(--byrm-red-bright); font-weight: 600; font-size: 14px; }
+.byrm-dlwait .byrm-arrow::after { content: " →"; }
+.byrm-dlwait .byrm-arrow:hover { color: var(--byrm-ember); }
+
+/* --------------------------------------------------------------- panel ---- */
+
+.byrm-dlwait__panel {
+  padding: clamp(28px, 4vw, 44px) clamp(20px, 3vw, 34px);
+  text-align: center;
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+  border-top: 2px solid var(--byrm-red);
+}
+
+/* ---------------------------------------------------------------- ring ---- */
+
+.byrm-dlring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 136px;
+  height: 136px;
+  margin: 0 auto 18px;
+}
+
+.byrm-dlring svg {
+  width: 100%;
+  height: 100%;
+  /* Start the stroke at twelve o'clock rather than three. */
+  transform: rotate(-90deg);
+}
+
+.byrm-dlring__track,
+.byrm-dlring__fill {
+  fill: none;
+  stroke-width: 6;
+}
+
+.byrm-dlring__track { stroke: var(--byrm-line); }
+
+.byrm-dlring__fill {
+  stroke: var(--byrm-red-bright);
+  stroke-linecap: round;
+  /* JS sets the dash array and offset; this only smooths the steps between. */
+  transition: stroke-dashoffset .12s linear;
+}
+
+.byrm-dlring__num {
+  position: absolute;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.byrm-dlwait__status {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--byrm-chrome-lo);
+}
+
+/* --------------------------------------------------------------- ready ---- */
+
+.byrm-dlwait__go {
+  margin: 0 0 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--byrm-ember);
+}
+
+/* The empty state is a sentence, so it gets sentence styling rather than the
+   small-caps label above. */
+.byrm-dlwait__empty {
+  margin: 0 auto 20px;
+  max-width: 48ch;
+  font-size: 15.5px;
+  line-height: 1.75;
+  color: var(--byrm-chrome);
+}
+
+/* The wrapper also carries .byrm-guide, and guide.css paints every link in
+   there red with `.byrm-guide a:not(.byrm-btn)`. That is more specific than a
+   lone class, so the selector below has to match it to keep the label white. */
+.byrm-dlwait a.byrm-dlwait__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 34px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, var(--byrm-red), var(--byrm-red-deep));
+  border: 1px solid var(--byrm-red-bright);
+  box-shadow: 0 6px 26px rgba(255, 58, 42, .35);
+}
+
+.byrm-dlwait a.byrm-dlwait__btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.byrm-dlwait a.byrm-dlwait__btn:hover,
+.byrm-dlwait a.byrm-dlwait__btn:focus-visible {
+  color: #fff;
+  box-shadow: 0 8px 32px rgba(255, 58, 42, .55);
+}
+
+.byrm-dlwait a.byrm-dlwait__btn:active { transform: translateY(1px); }
+
+/* The reveal, kept gentle — this is not a moment that wants a flourish. */
+.byrm-dlwait__ready:not([hidden]) {
+  animation: byrm-dlwait-in .3s var(--byrm-ease) both;
+}
+
+@keyframes byrm-dlwait-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* --------------------------------------------------------------- facts ---- */
+
+.byrm-dlwait__facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 28px;
+  margin: 26px 0 0;
+  padding: 20px 0 0;
+  list-style: none;
+  border-top: 1px solid var(--byrm-line);
+}
+
+.byrm-dlwait__facts li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.byrm-dlwait__facts span {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-dlwait__facts strong {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--byrm-chrome-hi);
+}
+
+.byrm-dlwait__host {
+  margin: 18px 0 0;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--byrm-chrome-lo);
+}
+.byrm-dlwait__host strong { color: var(--byrm-chrome-hi); }
+
+/* ------------------------------------------------------- while you wait ---- */
+
+.byrm-dlwait__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.byrm-dlwait__back {
+  margin: clamp(26px, 3.4vw, 36px) 0 0;
+  text-align: center;
+}
+
+/* -------------------------------------------------------------- narrow ---- */
+
+@media (max-width: 600px) {
+  .byrm-dlring { width: 112px; height: 112px; }
+  .byrm-dlring__num { font-size: 34px; }
+
+  .byrm-dlwait a.byrm-dlwait__btn { width: 100%; padding-inline: 20px; }
+  .byrm-dlwait__facts { gap: 10px 20px; }
+  .byrm-dlwait__grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------- reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .byrm-dlring__fill { transition: none; }
+  .byrm-dlwait__ready:not([hidden]) { animation: none; }
+}

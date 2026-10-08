@@ -354,6 +354,35 @@ function byrm_map_download_url( $post_id = null ) {
 	return home_url( 'map-download/' . $post_id . '/' );
 }
 
+/**
+ * The URL the wait page's button points at: this is the one that counts the
+ * download and forwards to the file host.
+ *
+ * @param  int|null $post_id Post to read, or the current post.
+ * @return string Empty when the map has no file attached.
+ */
+function byrm_map_download_go_url( $post_id = null ) {
+	$post_id = $post_id ? (int) $post_id : get_the_ID();
+
+	if ( '' === byrm_map_file_url( $post_id ) ) {
+		return '';
+	}
+
+	return home_url( 'map-download/' . $post_id . '/go/' );
+}
+
+/**
+ * How long the wait page counts down for, in seconds.
+ *
+ * Filterable so it can be changed without editing this file, and so it can be
+ * set to 0 to turn the wait off entirely.
+ *
+ * @return int
+ */
+function byrm_download_wait_seconds() {
+	return max( 0, (int) apply_filters( 'byrm_download_wait_seconds', 10 ) );
+}
+
 /* ==========================================================================
    Counted downloads
    ========================================================================== */
@@ -362,9 +391,35 @@ function byrm_map_download_url( $post_id = null ) {
  * Pretty URL for the download endpoint.
  */
 function byrm_download_rewrite() {
+	// Both patterns are anchored, so /go/ can never fall through to the first.
+	add_rewrite_rule(
+		'^map-download/([0-9]+)/go/?$',
+		'index.php?byrm_map_download=$matches[1]&byrm_map_download_go=1',
+		'top'
+	);
 	add_rewrite_rule( '^map-download/([0-9]+)/?$', 'index.php?byrm_map_download=$matches[1]', 'top' );
 }
 add_action( 'init', 'byrm_download_rewrite' );
+
+/**
+ * Rebuild the rewrite rules when the set above changes.
+ *
+ * Rules are only written to the database on activation, so adding one to an
+ * already-active plugin would otherwise 404 until somebody thought to open
+ * Settings, Permalinks and press Save. Bumping the constant does it for them,
+ * once, on the next page load.
+ */
+function byrm_maybe_flush_rewrites() {
+	$version = '2';
+
+	if ( get_option( 'byrm_rewrite_version' ) === $version ) {
+		return;
+	}
+
+	flush_rewrite_rules( false );
+	update_option( 'byrm_rewrite_version', $version, true );
+}
+add_action( 'init', 'byrm_maybe_flush_rewrites', 99 );
 
 /**
  * @param  array<int, string> $vars Registered query vars.
@@ -372,21 +427,32 @@ add_action( 'init', 'byrm_download_rewrite' );
  */
 function byrm_download_query_var( $vars ) {
 	$vars[] = 'byrm_map_download';
+	$vars[] = 'byrm_map_download_go';
 
 	return $vars;
 }
 add_filter( 'query_vars', 'byrm_download_query_var' );
 
 /**
- * Count the download, then hand the visitor the file.
+ * Two steps: a wait page, then the file.
  *
- * The file lives on a third-party host and its link is public anyway, so this
- * endpoint is a counter rather than an access control: it records the download,
- * then forwards the visitor on. Routing through here instead of linking the host
- * directly is what makes the counter — and therefore the "most downloaded" sort
- * and the site totals — possible at all.
+ * /map-download/{id}/      shows map-download.php — the map's details and a
+ *                          countdown, after which the real button appears.
+ * /map-download/{id}/go/   counts the download and forwards to the file host.
+ *
+ * The file lives on a third-party host and its link is public anyway, so the
+ * second step is a counter rather than an access control: it records the
+ * download, then forwards the visitor on. Routing through here instead of
+ * linking the host directly is what makes the counter — and therefore the
+ * "most downloaded" sort and the site totals — possible at all. It also keeps
+ * the host's URL out of the page source until the visitor asks for it.
  *
  * Repeat hits from the same visitor inside 24 hours are not counted twice.
+ *
+ * If the theme has no map-download.php — a different theme, or the plugin used
+ * on another site — the wait step is skipped and this behaves exactly as it did
+ * before, forwarding straight on. The download must never be the thing that
+ * breaks.
  */
 function byrm_handle_download() {
 	$post_id = (int) get_query_var( 'byrm_map_download' );
@@ -415,6 +481,41 @@ function byrm_handle_download() {
 			esc_html__( 'No download', 'byrm-maps' ),
 			array( 'response' => 404 )
 		);
+	}
+
+	// Step one: the wait page. Skipped when the countdown is filtered to 0, and
+	// skipped when the theme has no template for it.
+	if ( ! get_query_var( 'byrm_map_download_go' ) && byrm_download_wait_seconds() > 0 ) {
+		$template = locate_template( 'map-download.php' );
+
+		if ( $template ) {
+			global $wp_query;
+
+			// The rewrite above matches no post, so WordPress has this down as a
+			// 404. Saying otherwise keeps the status line, the body classes and
+			// any caching layer in front of the site all honest.
+			$wp_query->is_404 = false;
+			status_header( 200 );
+
+			// Make the map the current post so ordinary template tags work.
+			$wp_query->posts         = array( $post );
+			$wp_query->post          = $post;
+			$wp_query->post_count    = 1;
+			$wp_query->found_posts   = 1;
+			$wp_query->is_singular   = true;
+			$wp_query->is_single     = true;
+			$wp_query->queried_object    = $post;
+			$wp_query->queried_object_id = $post_id;
+
+			setup_postdata( $post );
+
+			// A step on the way to a file is not a page anybody should land on
+			// from a search result.
+			add_filter( 'wp_robots', 'wp_robots_no_robots' );
+
+			require $template;
+			exit;
+		}
 	}
 
 	// Salted so no raw IP address is ever stored.
