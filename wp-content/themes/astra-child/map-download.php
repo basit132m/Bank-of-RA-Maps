@@ -20,7 +20,14 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$post_id = get_the_ID();
+// The query var is how this page was reached, so it is the one thing that is
+// certainly right. The loop globals are not: this rewrite matches no post, so
+// whether $GLOBALS['post'] holds the map depends on what else has run.
+$post_id = (int) get_query_var( 'byrm_map_download' );
+
+if ( ! $post_id ) {
+	$post_id = (int) get_the_ID();
+}
 
 $go_url   = function_exists( 'byrm_map_download_go_url' ) ? byrm_map_download_go_url( $post_id ) : '';
 $seconds  = function_exists( 'byrm_download_wait_seconds' ) ? byrm_download_wait_seconds() : 10;
@@ -42,7 +49,14 @@ $guides_url = home_url( '/guides/' );
 $install    = get_page_by_path( 'install' );
 $install_url = $install ? get_permalink( $install ) : $guides_url;
 
-$related = function_exists( 'byrm_related_maps' ) ? byrm_related_maps( $post_id, $players ) : array();
+// byrm_related_maps() renders — it echoes a section and returns nothing — so it
+// cannot be used here: calling it would print the map page's "More maps" block
+// above this document, and its markup is styled in map.css, which this page does
+// not load. byrm_related_map_posts() is the getter; the cards below are drawn
+// with byrm_map_card(), which home.css styles.
+$related = function_exists( 'byrm_related_map_posts' )
+	? byrm_related_map_posts( $post_id, $players )
+	: array();
 
 // The browser tab should say what is happening, not repeat the map's own title.
 add_filter(

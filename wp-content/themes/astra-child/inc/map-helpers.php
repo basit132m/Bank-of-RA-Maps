@@ -42,18 +42,24 @@ function byrm_map_banner_style() {
 }
 
 /**
- * Other maps worth showing underneath.
+ * Other maps worth showing, as posts.
  *
- * Prefers the same player count, because that is what decides whether a visitor
- * can actually play it tonight.
+ * Split out of byrm_related_maps() because that function renders — it echoes a
+ * whole section and returns nothing. Any page that wants the maps but not that
+ * markup needs this instead; the download wait page draws them with
+ * byrm_map_card() so they match the cards everywhere else on the site.
  *
- * @param int        $post_id Current map.
- * @param string|int $players Its player count.
+ * @param  int        $post_id Current map.
+ * @param  string|int $players Its player count.
+ * @param  int        $limit   How many to return.
+ * @return WP_Post[]
  */
-function byrm_related_maps( $post_id, $players = '' ) {
+function byrm_related_map_posts( $post_id, $players = '', $limit = 3 ) {
+	$limit = max( 1, (int) $limit );
+
 	$args = array(
 		'post_type'           => 'map',
-		'posts_per_page'      => 3,
+		'posts_per_page'      => $limit,
 		'post__not_in'        => array( (int) $post_id ),
 		'ignore_sticky_posts' => true,
 		'no_found_rows'       => true,
@@ -62,24 +68,22 @@ function byrm_related_maps( $post_id, $players = '' ) {
 	$related = array();
 
 	if ( $players ) {
-		$same = get_posts(
+		$related = get_posts(
 			$args + array(
 				'meta_key'   => '_byrm_players',
 				'meta_value' => (string) $players,
 			)
 		);
-
-		$related = $same;
 	}
 
 	// Top up with the most recent maps when there are not enough matches.
-	if ( count( $related ) < 3 ) {
+	if ( count( $related ) < $limit ) {
 		$exclude = array_merge( array( (int) $post_id ), wp_list_pluck( $related, 'ID' ) );
 
 		$filler = get_posts(
 			array(
 				'post_type'           => 'map',
-				'posts_per_page'      => 3 - count( $related ),
+				'posts_per_page'      => $limit - count( $related ),
 				'post__not_in'        => $exclude,
 				'ignore_sticky_posts' => true,
 				'no_found_rows'       => true,
@@ -88,6 +92,24 @@ function byrm_related_maps( $post_id, $players = '' ) {
 
 		$related = array_merge( $related, $filler );
 	}
+
+	return $related;
+}
+
+/**
+ * Other maps worth showing underneath.
+ *
+ * Renders. Echoes a section and returns nothing — use byrm_related_map_posts()
+ * above when you want the posts themselves.
+ *
+ * Prefers the same player count, because that is what decides whether a visitor
+ * can actually play it tonight.
+ *
+ * @param int        $post_id Current map.
+ * @param string|int $players Its player count.
+ */
+function byrm_related_maps( $post_id, $players = '' ) {
+	$related = byrm_related_map_posts( $post_id, $players );
 
 	if ( ! $related ) {
 		return;

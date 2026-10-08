@@ -507,6 +507,11 @@ function byrm_handle_download() {
 			$wp_query->queried_object    = $post;
 			$wp_query->queried_object_id = $post_id;
 
+			// setup_postdata() sets $id, $authordata and the paging globals, but
+			// NOT $GLOBALS['post'] — and this rewrite matched no post, so that
+			// global is whatever the empty main query left behind. Template tags
+			// called without an explicit ID read it, so it is set here too.
+			$GLOBALS['post'] = $post;
 			setup_postdata( $post );
 
 			// A step on the way to a file is not a page anybody should land on

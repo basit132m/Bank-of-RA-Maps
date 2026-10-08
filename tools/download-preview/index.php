@@ -78,6 +78,7 @@ function wp_reset_postdata(): void {}
 const MAP_ID = 42;
 
 function get_the_ID(): int { return MAP_ID; }
+function get_query_var(string $v, $default = '') { return 'byrm_map_download' === $v ? MAP_ID : $default; }
 function get_the_title($p = null): string
 {
     if (is_object($p)) { return $p->title; }
@@ -115,14 +116,25 @@ final class ByrmMap
     public function __construct(public int $ID, public string $slug, public string $title) {}
 }
 
-function byrm_related_maps($id, string $players = ''): array
+// The getter. Returns posts and prints nothing.
+function byrm_related_map_posts($id, string $players = '', int $limit = 3): array
 {
     if ($GLOBALS['BARE']) { return []; }
-    return [
+    return array_slice([
         new ByrmMap(43, 'frozen-divide', 'Frozen Divide'),
         new ByrmMap(44, 'tundra-crossing', 'Tundra Crossing'),
         new ByrmMap(45, 'glacier-run', 'Glacier Run'),
-    ];
+    ], 0, $limit);
+}
+
+// The renderer, stubbed to match the real one: it ECHOES and returns nothing.
+// Stubbing this as a getter is exactly how the first version of this harness
+// missed the template calling it in the wrong place, so it now behaves like the
+// real function and the verification asserts nothing is printed before the
+// doctype.
+function byrm_related_maps($id, string $players = ''): void
+{
+    echo '<section class="byrm-related">THIS SHOULD NEVER APPEAR BEFORE THE DOCTYPE</section>';
 }
 function has_post_thumbnail($id = null): bool { return false; }
 function get_the_post_thumbnail($id = null, $s = '', $a = []): string { return ''; }
