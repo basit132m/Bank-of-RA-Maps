@@ -162,11 +162,14 @@ function byrm_related_maps( $post_id, $players = '' ) {
 /**
  * The lightbox shell.
  *
- * Printed once per map page and filled in by map.js, so the markup exists
- * before any image is clicked and screen readers see a stable dialog.
+ * Printed once per map or mod page and filled in by map.js, so the markup
+ * exists before any image is clicked and screen readers see a stable dialog.
+ *
+ * Hooked to wp_footer, so a template never calls it: calling it as well would
+ * put two dialogs with the same id on the page.
  */
 function byrm_render_lightbox() {
-	if ( ! is_singular( 'map' ) ) {
+	if ( ! is_singular( array( 'map', 'mod' ) ) ) {
 		return;
 	}
 	?>

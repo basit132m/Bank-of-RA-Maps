@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name:       Bank of YR Maps — Map Library
- * Description:       The Map post type, its specification fields, screenshot gallery and counted downloads. Kept in a plugin so the map catalogue survives any theme change.
+ * Plugin Name:       Bank of YR Maps — Map & Mod Library
+ * Description:       The Map and Mod post types, their fields, screenshot galleries and counted downloads. Kept in a plugin so the catalogue survives any theme change.
  * Version:           1.0.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
@@ -339,6 +339,28 @@ function byrm_map_downloads( $post_id = null ) {
 }
 
 /**
+ * Post types with an off-site file and a counted download.
+ *
+ * @return string[]
+ */
+function byrm_downloadable_post_types() {
+	return (array) apply_filters( 'byrm_downloadable_post_types', array( 'map', 'mod' ) );
+}
+
+/**
+ * The URL prefix a post's download goes through.
+ *
+ * Mods get /mod-download/ rather than being pushed through a path called
+ * "map-download" — same machinery, honest URL.
+ *
+ * @param  int $post_id Post to read.
+ * @return string
+ */
+function byrm_download_base( $post_id ) {
+	return ( 'mod' === get_post_type( $post_id ) ) ? 'mod-download' : 'map-download';
+}
+
+/**
  * Public URL that counts the download before handing over the file.
  *
  * @param  int|null $post_id Post to read, or the current post.
@@ -351,7 +373,7 @@ function byrm_map_download_url( $post_id = null ) {
 		return '';
 	}
 
-	return home_url( 'map-download/' . $post_id . '/' );
+	return home_url( byrm_download_base( $post_id ) . '/' . $post_id . '/' );
 }
 
 /**
@@ -368,7 +390,7 @@ function byrm_map_download_go_url( $post_id = null ) {
 		return '';
 	}
 
-	return home_url( 'map-download/' . $post_id . '/go/' );
+	return home_url( byrm_download_base( $post_id ) . '/' . $post_id . '/go/' );
 }
 
 /**
@@ -391,13 +413,17 @@ function byrm_download_wait_seconds() {
  * Pretty URL for the download endpoint.
  */
 function byrm_download_rewrite() {
-	// Both patterns are anchored, so /go/ can never fall through to the first.
-	add_rewrite_rule(
-		'^map-download/([0-9]+)/go/?$',
-		'index.php?byrm_map_download=$matches[1]&byrm_map_download_go=1',
-		'top'
-	);
-	add_rewrite_rule( '^map-download/([0-9]+)/?$', 'index.php?byrm_map_download=$matches[1]', 'top' );
+	// One handler, two prefixes: maps keep theirs and mods get their own, so a
+	// mod's download URL does not read as a map's.
+	foreach ( array( 'map-download', 'mod-download' ) as $base ) {
+		// Both patterns are anchored, so /go/ can never fall through to the first.
+		add_rewrite_rule(
+			'^' . $base . '/([0-9]+)/go/?$',
+			'index.php?byrm_map_download=$matches[1]&byrm_map_download_go=1',
+			'top'
+		);
+		add_rewrite_rule( '^' . $base . '/([0-9]+)/?$', 'index.php?byrm_map_download=$matches[1]', 'top' );
+	}
 }
 add_action( 'init', 'byrm_download_rewrite' );
 
@@ -410,7 +436,7 @@ add_action( 'init', 'byrm_download_rewrite' );
  * once, on the next page load.
  */
 function byrm_maybe_flush_rewrites() {
-	$version = '2';
+	$version = '3';
 
 	if ( get_option( 'byrm_rewrite_version' ) === $version ) {
 		return;
@@ -463,10 +489,12 @@ function byrm_handle_download() {
 
 	$post = get_post( $post_id );
 
-	if ( ! $post || 'map' !== $post->post_type || 'publish' !== $post->post_status ) {
+	if ( ! $post
+		|| ! in_array( $post->post_type, byrm_downloadable_post_types(), true )
+		|| 'publish' !== $post->post_status ) {
 		wp_die(
-			esc_html__( 'That map is not available.', 'byrm-maps' ),
-			esc_html__( 'Map not found', 'byrm-maps' ),
+			esc_html__( 'That download is not available.', 'byrm-maps' ),
+			esc_html__( 'Not found', 'byrm-maps' ),
 			array( 'response' => 404 )
 		);
 	}
@@ -477,7 +505,7 @@ function byrm_handle_download() {
 
 	if ( ! $url ) {
 		wp_die(
-			esc_html__( 'That map has no download link yet.', 'byrm-maps' ),
+			esc_html__( 'That has no download link yet.', 'byrm-maps' ),
 			esc_html__( 'No download', 'byrm-maps' ),
 			array( 'response' => 404 )
 		);
@@ -555,3 +583,4 @@ function byrm_visitor_ip() {
    ========================================================================== */
 
 require_once plugin_dir_path( BYRM_MAPS_FILE ) . 'admin.php';
+require_once plugin_dir_path( BYRM_MAPS_FILE ) . 'mods.php';

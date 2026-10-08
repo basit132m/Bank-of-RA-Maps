@@ -19,6 +19,7 @@ require_once get_stylesheet_directory() . '/inc/community-helpers.php';
 require_once get_stylesheet_directory() . '/inc/search-helpers.php';
 require_once get_stylesheet_directory() . '/inc/guide-helpers.php';
 require_once get_stylesheet_directory() . '/inc/about-helpers.php';
+require_once get_stylesheet_directory() . '/inc/mod-helpers.php';
 require_once get_stylesheet_directory() . '/inc/tweaker.php';
 
 /**
@@ -201,6 +202,60 @@ function byrm_enqueue_assets() {
 			array(),
 			file_exists( $tweaker_js ) ? (string) filemtime( $tweaker_js ) : BYRM_CHILD_VERSION,
 			true
+		);
+	}
+
+	// Mods reuse the map and archive designs, then add the few pieces that have
+	// no map equivalent.
+	if ( byrm_is_mod_page() ) {
+		$home_css = $dir . '/assets/css/home.css';
+		wp_enqueue_style(
+			'byrm-home',
+			$uri . '/assets/css/home.css',
+			array( 'byrm-header' ),
+			file_exists( $home_css ) ? (string) filemtime( $home_css ) : BYRM_CHILD_VERSION
+		);
+
+		$deps = array( 'byrm-home' );
+
+		if ( byrm_is_mod_archive() ) {
+			$archive_css = $dir . '/assets/css/archive.css';
+			wp_enqueue_style(
+				'byrm-archive',
+				$uri . '/assets/css/archive.css',
+				array( 'byrm-home' ),
+				file_exists( $archive_css ) ? (string) filemtime( $archive_css ) : BYRM_CHILD_VERSION
+			);
+			$deps[] = 'byrm-archive';
+		}
+
+		if ( is_singular( 'mod' ) ) {
+			$map_css = $dir . '/assets/css/map.css';
+			wp_enqueue_style(
+				'byrm-map',
+				$uri . '/assets/css/map.css',
+				array( 'byrm-home' ),
+				file_exists( $map_css ) ? (string) filemtime( $map_css ) : BYRM_CHILD_VERSION
+			);
+			$deps[] = 'byrm-map';
+
+			// The gallery and lightbox are the same script the map page uses.
+			$map_js = $dir . '/assets/js/map.js';
+			wp_enqueue_script(
+				'byrm-map',
+				$uri . '/assets/js/map.js',
+				array(),
+				file_exists( $map_js ) ? (string) filemtime( $map_js ) : BYRM_CHILD_VERSION,
+				true
+			);
+		}
+
+		$mod_css = $dir . '/assets/css/mod.css';
+		wp_enqueue_style(
+			'byrm-mod',
+			$uri . '/assets/css/mod.css',
+			$deps,
+			file_exists( $mod_css ) ? (string) filemtime( $mod_css ) : BYRM_CHILD_VERSION
 		);
 	}
 
@@ -525,6 +580,7 @@ function byrm_is_full_width_template() {
 		|| byrm_is_tweaker_page()
 		|| byrm_is_about_page()
 		|| byrm_is_download_page()
+		|| byrm_is_mod_page()
 		|| is_search();
 }
 

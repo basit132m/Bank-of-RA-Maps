@@ -1,0 +1,104 @@
+/* ============================================================================
+ * Mods
+ *
+ * Loaded after home.css, archive.css and map.css. A mod page is the same design
+ * as a map page, so almost everything comes from those; this file holds only
+ * the pieces that have no map equivalent — the type chips on the browse page
+ * and the warning on a mod that is not multiplayer safe.
+ *
+ * Every class here is prefixed byrm-mod- or extends .byrm-chip, and none of
+ * them appears in another stylesheet.
+ * ========================================================================= */
+
+/* The browse page has no filter rail, so it does not use .byrm-archive__layout
+   and needs its own vertical rhythm. */
+.byrm-modlist__body {
+  padding-block: clamp(26px, 4vw, 44px);
+}
+
+/* --------------------------------------------------------- type chips ---- */
+
+.byrm-modtypes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: clamp(20px, 3vw, 30px);
+  padding-bottom: clamp(18px, 2.6vw, 26px);
+  border-bottom: 1px solid var(--byrm-line);
+}
+
+/* .byrm-chip was built for removable filter chips, which carry a red × in an
+   aria-hidden span. These are navigation, so the count gets its own class and
+   the chip needs a selected state the filter chips never needed. */
+.byrm-modtypes .byrm-chip {
+  text-decoration: none;
+  align-items: baseline;
+}
+
+.byrm-chip__n {
+  margin-left: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-chip--on {
+  color: #fff;
+  background: rgba(224, 31, 31, .3);
+  border-color: var(--byrm-red-bright);
+}
+.byrm-chip--on .byrm-chip__n { color: var(--byrm-chrome-hi); }
+
+/* ------------------------------------------------------- details panel ---- */
+
+/* A map's specs are all plain values, so map.css never had to style a link in
+   here. A mod's "Official page" is one, and it inherits a dark red that is all
+   but unreadable on the panel. */
+.byrm-mod .byrm-specs__list a {
+  color: var(--byrm-chrome-hi);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.byrm-mod .byrm-specs__list a:hover,
+.byrm-mod .byrm-specs__list a:focus-visible {
+  color: var(--byrm-red-bright);
+}
+
+/* ------------------------------------------------------------ warning ---- */
+
+/* A mod rewrites the game, not one map. Saying so quietly in a paragraph is
+   not enough — people lose installs this way. */
+.byrm-modwarn {
+  padding: clamp(20px, 2.8vw, 28px) clamp(20px, 3vw, 30px);
+  background: rgba(224, 31, 31, .07);
+  border: 1px solid var(--byrm-line);
+  border-left: 3px solid var(--byrm-red);
+}
+
+.byrm-modwarn h2 {
+  margin: 0 0 12px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: .01em;
+  color: var(--byrm-chrome-hi);
+  text-transform: none;
+  border: 0;
+  padding: 0;
+}
+.byrm-modwarn h2::after { content: none; }
+
+.byrm-modwarn p {
+  margin: 0 0 12px;
+  max-width: 68ch;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--byrm-chrome);
+}
+.byrm-modwarn p:last-child { margin-bottom: 0; }
+
+/* -------------------------------------------------------------- narrow ---- */
+
+@media (max-width: 600px) {
+  .byrm-modtypes { gap: 6px; }
+}

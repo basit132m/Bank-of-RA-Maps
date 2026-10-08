@@ -193,13 +193,16 @@ function byrm_render_file_box( $post ) {
  * @param WP_Post $post Current post.
  */
 function byrm_render_specs_box( $post ) {
-	$fields = byrm_map_fields();
+	// This panel is registered for both Maps and Mods. The two have different
+	// field lists, so it asks the post type rather than assuming.
+	$is_mod = ( 'mod' === $post->post_type && function_exists( 'byrm_mod_fields' ) );
+	$fields = $is_mod ? byrm_mod_fields() : byrm_map_fields();
 	?>
 	<table class="form-table byrm-specs-table" role="presentation">
 		<tbody>
 		<?php foreach ( $fields as $key => $field ) : ?>
 			<?php
-			$value = byrm_map_meta( $key, $post->ID );
+			$value = $is_mod ? byrm_mod_meta( $key, $post->ID ) : byrm_map_meta( $key, $post->ID );
 			$id    = 'byrm-field-' . $key;
 			$name  = 'byrm_field[' . $key . ']';
 			?>
@@ -276,8 +279,11 @@ function byrm_save_map( $post_id ) {
 		return;
 	}
 
-	// Specification fields.
-	$fields   = byrm_map_fields();
+	// Specification fields. Hooked to both save_post_map and save_post_mod, so
+	// the list comes from the post type being saved.
+	$fields = ( 'mod' === get_post_type( $post_id ) && function_exists( 'byrm_mod_fields' ) )
+		? byrm_mod_fields()
+		: byrm_map_fields();
 	$submitted = isset( $_POST['byrm_field'] ) && is_array( $_POST['byrm_field'] )
 		? wp_unslash( $_POST['byrm_field'] )
 		: array();
@@ -342,7 +348,7 @@ function byrm_admin_assets( $hook ) {
 		return;
 	}
 
-	if ( get_post_type() !== 'map' ) {
+	if ( ! in_array( get_post_type(), array( 'map', 'mod' ), true ) ) {
 		return;
 	}
 
@@ -365,7 +371,7 @@ function byrm_admin_assets( $hook ) {
 		array(
 			'galleryTitle' => __( 'Select screenshots', 'byrm-maps' ),
 			'galleryButton' => __( 'Use these images', 'byrm-maps' ),
-			'confirmClear' => __( 'Remove all screenshots from this map?', 'byrm-maps' ),
+			'confirmClear' => __( 'Remove all screenshots?', 'byrm-maps' ),
 		)
 	);
 
