@@ -209,7 +209,19 @@ while ( have_posts() ) :
 						<span class="byrm-dl__eyebrow"><?php esc_html_e( 'Download', 'astra-child' ); ?></span>
 
 						<?php if ( $download_url ) : ?>
-							<a class="byrm-dl__btn" href="<?php echo esc_url( $download_url ); ?>">
+							<?php
+							// Opens in a new tab so the map page — the screenshots, the
+							// specs, the description — is still there to come back to.
+							// The accessible name starts with the visible text and then
+							// says what the link does, which is what a screen reader
+							// needs and a sighted user cannot see from the icon.
+							?>
+							<a
+								class="byrm-dl__btn"
+								href="<?php echo esc_url( $download_url ); ?>"
+								target="_blank"
+								rel="noopener"
+								aria-label="<?php esc_attr_e( 'Get this map (opens in a new tab)', 'astra-child' ); ?>">
 								<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
 									<path d="M12 4v11M7 11l5 5 5-5M5 20h14" stroke-linecap="round" stroke-linejoin="round"/>
 								</svg>

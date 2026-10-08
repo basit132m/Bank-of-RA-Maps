@@ -126,7 +126,13 @@ $hero_art = ( $featured && has_post_thumbnail( $featured->ID ) )
 								<?php esc_html_e( 'Map details', 'astra-child' ); ?>
 							</a>
 							<?php if ( $f_download ) : ?>
-								<a class="byrm-btn byrm-btn--ghost" href="<?php echo esc_url( $f_download ); ?>">
+								<?php // New tab, so the home page is not lost behind the download. ?>
+								<a
+									class="byrm-btn byrm-btn--ghost"
+									href="<?php echo esc_url( $f_download ); ?>"
+									target="_blank"
+									rel="noopener"
+									aria-label="<?php esc_attr_e( 'Download (opens in a new tab)', 'astra-child' ); ?>">
 									<?php esc_html_e( 'Download', 'astra-child' ); ?>
 								</a>
 							<?php endif; ?>
