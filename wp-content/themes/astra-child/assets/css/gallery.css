@@ -1,0 +1,285 @@
+/* ============================================================================
+ * The image wall
+ *
+ * Loaded after home.css, which supplies .byrm-btn and .byrm-empty. Everything
+ * else is here. Class names are prefixed byrm-gal- and none of them appears in
+ * another stylesheet.
+ * ========================================================================= */
+
+/* The root, same as every other section's. Without the font-family the whole
+   page falls back to a serif, because the theme sets it per section rather
+   than globally. */
+.byrm-gal {
+  font-family: var(--byrm-font);
+  color: var(--byrm-chrome);
+  background: var(--byrm-steel-800);
+}
+
+/* .byrm-crumbs lives in guide.css, archive.css and map.css — none of which
+   this page loads. Repeated here rather than pulling in a whole stylesheet
+   for nine lines. */
+.byrm-gal .byrm-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: 12.5px;
+  letter-spacing: .04em;
+  color: var(--byrm-chrome-lo);
+}
+.byrm-gal .byrm-crumbs a { color: var(--byrm-chrome-lo); text-decoration: none; }
+.byrm-gal .byrm-crumbs a:hover { color: var(--byrm-red-bright); }
+.byrm-gal .byrm-crumbs span[aria-hidden] { color: var(--byrm-line); }
+
+/* Every stylesheet in this theme opens with this, scoped to its own root.
+   Leaving it out is what made the shell 40px wider than the viewport on a
+   phone: width:100% plus padding under content-box. */
+.byrm-gal,
+.byrm-gal *,
+.byrm-gal *::before,
+.byrm-gal *::after { box-sizing: border-box; }
+
+.byrm-gal__shell {
+  width: 100%;
+  max-width: var(--byrm-shell);
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+/* ---------------------------------------------------------------- head ---- */
+
+.byrm-gal__head {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1px solid var(--byrm-line);
+  background-color: var(--byrm-steel-900);
+}
+
+.byrm-gal__veilhead {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(760px 300px at 20% 0%, rgba(224, 31, 31, .2), transparent 70%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .018) 0 2px, transparent 2px 9px);
+}
+
+.byrm-gal__headinner { padding-block: clamp(30px, 5vw, 54px) clamp(26px, 4vw, 40px); }
+
+.byrm-gal__eyebrow {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--byrm-red-bright);
+}
+
+.byrm-gal__title {
+  margin: 0 0 14px;
+  font-size: clamp(28px, 4.6vw, 44px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -.01em;
+  color: #fff;
+}
+
+.byrm-gal__lead {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--byrm-chrome-lo);
+}
+
+.byrm-gal__stat {
+  margin: 14px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--byrm-red-bright);
+}
+
+.byrm-gal__body { padding-block: clamp(26px, 4vw, 44px) clamp(40px, 6vw, 72px); }
+
+.byrm-gal__intro {
+  max-width: 68ch;
+  margin-bottom: clamp(22px, 3vw, 32px);
+  font-size: 15.5px;
+  line-height: 1.75;
+  color: var(--byrm-chrome);
+}
+
+/* ---------------------------------------------------------------- grid ---- */
+
+.byrm-gal__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.byrm-gal__tile {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: var(--byrm-steel-700);
+  border: 1px solid var(--byrm-line);
+}
+
+.byrm-gal__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .5s var(--byrm-ease);
+
+  /* Decoration only. Without this it sits over the stretched tile link and
+     eats the click — on a page whose entire purpose is clicking images. */
+  pointer-events: none;
+}
+
+/* The caption sits on the image, so it needs its own backing to stay readable
+   over whatever happens to be behind it. */
+.byrm-gal__veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(8, 11, 15, .92) 0%, rgba(8, 11, 15, .55) 34%, rgba(8, 11, 15, 0) 62%);
+  pointer-events: none;
+}
+
+/* The link IS the tile. Everything decorative lives inside it, so a click
+   anywhere on the picture goes to the map without any stretched-pseudo trick
+   and without nesting the download link inside another link. */
+.byrm-gal__link {
+  position: absolute;
+  inset: 0;
+  display: block;
+  text-decoration: none;
+}
+
+.byrm-gal__cap {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: block;
+  padding: 14px 16px;
+}
+
+.byrm-gal__name {
+  display: block;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: .01em;
+  color: #fff;
+}
+
+.byrm-gal__meta {
+  display: block;
+  margin: 5px 0 0;
+  font-size: 12px;
+  letter-spacing: .04em;
+  color: var(--byrm-chrome);
+}
+.byrm-gal__meta span { margin-inline: 5px; color: var(--byrm-chrome-lo); }
+
+/* Above the stretched link, so it stays clickable. */
+.byrm-gal__dl {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  color: #fff;
+  background: rgba(8, 11, 15, .72);
+  border: 1px solid var(--byrm-line);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity .2s var(--byrm-ease), transform .2s var(--byrm-ease), background .2s;
+}
+
+.byrm-gal__dl svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.byrm-gal__tile:hover .byrm-gal__dl,
+.byrm-gal__tile:focus-within .byrm-gal__dl {
+  opacity: 1;
+  transform: none;
+}
+
+.byrm-gal__dl:hover,
+.byrm-gal__dl:focus-visible {
+  color: #fff;
+  background: var(--byrm-red);
+  border-color: var(--byrm-red-bright);
+}
+
+.byrm-gal__tile:hover .byrm-gal__img { transform: scale(1.04); }
+
+.byrm-gal__link:focus-visible,
+.byrm-gal__dl:focus-visible { outline: 2px solid var(--byrm-ember); outline-offset: 2px; }
+
+/* ---------------------------------------------------------------- foot ---- */
+
+.byrm-gal__foot {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(26px, 3.4vw, 36px);
+}
+
+.byrm-gal__more { min-width: 220px; justify-content: center; }
+.byrm-gal__more[aria-busy="true"] { opacity: .7; pointer-events: none; }
+
+.byrm-gal__end {
+  margin: 0;
+  font-size: 14px;
+  color: var(--byrm-chrome-lo);
+}
+.byrm-gal__end a { color: var(--byrm-red-bright); }
+.byrm-gal__end a:hover { color: var(--byrm-ember); }
+
+/* The live region: announced, never shown. */
+.byrm-gal__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* -------------------------------------------------------------- narrow ---- */
+
+@media (max-width: 600px) {
+  .byrm-gal__grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+
+  /* No hover on a touchscreen, so the download would never appear. */
+  .byrm-gal__dl { opacity: 1; transform: none; }
+
+  .byrm-gal__more { width: 100%; }
+}
+
+/* --------------------------------------------------- reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .byrm-gal__img,
+  .byrm-gal__dl { transition: none; }
+  .byrm-gal__tile:hover .byrm-gal__img { transform: none; }
+}

@@ -20,6 +20,7 @@ require_once get_stylesheet_directory() . '/inc/search-helpers.php';
 require_once get_stylesheet_directory() . '/inc/guide-helpers.php';
 require_once get_stylesheet_directory() . '/inc/about-helpers.php';
 require_once get_stylesheet_directory() . '/inc/mod-helpers.php';
+require_once get_stylesheet_directory() . '/inc/gallery-helpers.php';
 require_once get_stylesheet_directory() . '/inc/tweaker.php';
 
 /**
@@ -201,6 +202,35 @@ function byrm_enqueue_assets() {
 			$uri . '/assets/js/tweaker.js',
 			array(),
 			file_exists( $tweaker_js ) ? (string) filemtime( $tweaker_js ) : BYRM_CHILD_VERSION,
+			true
+		);
+	}
+
+	// The image wall: buttons and the empty state come from home.css, the grid
+	// and the scroll loader are its own.
+	if ( byrm_is_gallery_page() ) {
+		$home_css = $dir . '/assets/css/home.css';
+		wp_enqueue_style(
+			'byrm-home',
+			$uri . '/assets/css/home.css',
+			array( 'byrm-header' ),
+			file_exists( $home_css ) ? (string) filemtime( $home_css ) : BYRM_CHILD_VERSION
+		);
+
+		$gallery_css = $dir . '/assets/css/gallery.css';
+		wp_enqueue_style(
+			'byrm-gallery',
+			$uri . '/assets/css/gallery.css',
+			array( 'byrm-home' ),
+			file_exists( $gallery_css ) ? (string) filemtime( $gallery_css ) : BYRM_CHILD_VERSION
+		);
+
+		$gallery_js = $dir . '/assets/js/gallery.js';
+		wp_enqueue_script(
+			'byrm-gallery',
+			$uri . '/assets/js/gallery.js',
+			array(),
+			file_exists( $gallery_js ) ? (string) filemtime( $gallery_js ) : BYRM_CHILD_VERSION,
 			true
 		);
 	}
@@ -581,6 +611,7 @@ function byrm_is_full_width_template() {
 		|| byrm_is_about_page()
 		|| byrm_is_download_page()
 		|| byrm_is_mod_page()
+		|| byrm_is_gallery_page()
 		|| is_search();
 }
 
