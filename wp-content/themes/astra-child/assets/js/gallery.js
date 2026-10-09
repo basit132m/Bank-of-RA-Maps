@@ -195,41 +195,129 @@
 	}
 }());
 
-/* ====================================================================
+/* ============================================================================
  * The viewer
  *
  * The tiles link to the full-size image, so with no script a click still
  * opens the picture. Here that is intercepted and the dialog opens instead.
+ *
+ * Two things this is careful about, both of which turn the viewer back into
+ * plain navigation — a click on a tile loading the bare image file:
+ *
+ *   The dialog may not be in the page at all. It is printed by the gallery
+ *   template, and a theme whose template has not been updated has tiles that
+ *   point at images and nothing to show them in. So the markup is built here
+ *   when it is missing, and the template's copy is used when it is there.
+ *
+ *   position: fixed resolves against the nearest ancestor with a transform,
+ *   a filter or contain — not the viewport. Inside the page content, one such
+ *   ancestor anywhere above it (Astra, a page builder, an optimisation plugin)
+ *   drops the overlay into the flow at the foot of the page instead of over
+ *   the screen. Moving it to <body> removes every candidate but body itself.
  *
  * The list of tiles is read from the DOM every time the viewer opens, not
  * cached at load: infinite scroll keeps adding tiles, and a list captured
  * once would stop at whatever was on the page when the script ran.
  * ================================================================= */
 (function viewer() {
-	var lb = document.getElementById('byrm-glb');
+	'use strict';
 
-	if (!lb) {
-		return;
-	}
+	// Only the labels: everything structural is in the classes and the
+	// data- hooks. The template's copy is translated; this fallback is not,
+	// which is the price of it existing at all.
+	var MARKUP = [
+		'<div class="byrm-glb__backdrop"></div>',
+		'<div class="byrm-glb__bar">',
+		'<p class="byrm-glb__count" data-glb-count></p>',
+		'<a class="byrm-glb__open" data-glb-open href="#" target="_blank" rel="noopener">Open the map page</a>',
+		'<button type="button" class="byrm-glb__btn" data-glb-close>',
+		'<span class="byrm-gal__sr">Close</span>',
+		'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+		'</button>',
+		'</div>',
+		'<button type="button" class="byrm-glb__nav byrm-glb__nav--prev" data-glb-prev>',
+		'<span class="byrm-gal__sr">Previous map</span>',
+		'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg>',
+		'</button>',
+		'<figure class="byrm-glb__stage">',
+		'<img class="byrm-glb__img" data-glb-img alt="">',
+		'<figcaption class="byrm-glb__cap" data-glb-cap></figcaption>',
+		'</figure>',
+		'<button type="button" class="byrm-glb__nav byrm-glb__nav--next" data-glb-next>',
+		'<span class="byrm-gal__sr">Next map</span>',
+		'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg>',
+		'</button>'
+	].join('');
 
-	var img = lb.querySelector('[data-glb-img]');
-	var cap = lb.querySelector('[data-glb-cap]');
-	var count = lb.querySelector('[data-glb-count]');
-	var openLink = lb.querySelector('[data-glb-open]');
-	var prev = lb.querySelector('[data-glb-prev]');
-	var next = lb.querySelector('[data-glb-next]');
-	var closers = lb.querySelectorAll('[data-glb-close]');
-
-	if (!img || !prev || !next) {
-		return;
-	}
-
+	var lb = null;
+	var img, cap, count, openLink, prev, next;
 	var shots = [];
 	var at = -1;
 	var opener = null;
 
 	function collect() {
 		shots = Array.prototype.slice.call(document.querySelectorAll('[data-byrm-gal-shot]'));
+	}
+
+	/**
+	 * The dialog, built if the template did not print one, reparented to
+	 * <body> either way. Runs once, on the first click.
+	 *
+	 * @return {boolean} Whether there is a usable dialog.
+	 */
+	function build() {
+		if (lb) {
+			return true;
+		}
+
+		lb = document.getElementById('byrm-glb');
+
+		if (!lb) {
+			lb = document.createElement('div');
+			lb.id = 'byrm-glb';
+			lb.className = 'byrm-glb';
+			lb.setAttribute('role', 'dialog');
+			lb.setAttribute('aria-modal', 'true');
+			lb.setAttribute('aria-label', 'Map image viewer');
+			lb.hidden = true;
+			lb.innerHTML = MARKUP;
+		}
+
+		if (lb.parentNode !== document.body) {
+			document.body.appendChild(lb);
+		}
+
+		img = lb.querySelector('[data-glb-img]');
+		cap = lb.querySelector('[data-glb-cap]');
+		count = lb.querySelector('[data-glb-count]');
+		openLink = lb.querySelector('[data-glb-open]');
+		prev = lb.querySelector('[data-glb-prev]');
+		next = lb.querySelector('[data-glb-next]');
+
+		if (!img || !prev || !next) {
+			lb = null;
+			return false;
+		}
+
+		prev.addEventListener('click', function () { step(-1); });
+		next.addEventListener('click', function () { step(1); });
+
+		Array.prototype.forEach.call(lb.querySelectorAll('[data-glb-close]'), function (el) {
+			el.addEventListener('click', close);
+		});
+
+		// Clicking away from the picture closes it. The stage fills the middle
+		// column, so without this only the thin margins either side of it
+		// would work — which reads as a viewer that ignores you.
+		lb.addEventListener('click', function (event) {
+			var t = event.target;
+
+			if (t === lb || t.classList.contains('byrm-glb__backdrop') || t.classList.contains('byrm-glb__stage')) {
+				close();
+			}
+		});
+
+		return true;
 	}
 
 	function show(index) {
@@ -327,31 +415,18 @@
 			return;
 		}
 
+		// Only now, so a page with no gallery on it gains nothing.
+		if (!build()) {
+			return;
+		}
+
 		event.preventDefault();
 		collect();
 		open(shots.indexOf(shot), shot);
 	});
 
-	prev.addEventListener('click', function () { step(-1); });
-	next.addEventListener('click', function () { step(1); });
-
-	Array.prototype.forEach.call(closers, function (el) {
-		el.addEventListener('click', close);
-	});
-
-	// Clicking away from the picture closes it. The stage fills the middle
-	// column, so without this only the thin margins either side of it would
-	// work — which reads as a viewer that ignores you.
-	lb.addEventListener('click', function (event) {
-		var t = event.target;
-
-		if (t === lb || t.classList.contains('byrm-glb__backdrop') || t.classList.contains('byrm-glb__stage')) {
-			close();
-		}
-	});
-
 	document.addEventListener('keydown', function (event) {
-		if (lb.hidden) {
+		if (!lb || lb.hidden) {
 			return;
 		}
 
