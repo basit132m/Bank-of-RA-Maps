@@ -152,6 +152,19 @@ function byrm_map_meta(string $key, $id = null)
 }
 function byrm_map_download_url($id = null): string { return '/map-download/' . (int) $id . '/'; }
 
+// The viewer reads the original upload's URL and dimensions from here.
+function wp_get_attachment_image_src($id, $size = '')
+{
+    $hue = ((int) $id * 37) % 360;
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">'
+        . '<rect width="1280" height="720" fill="hsl(' . $hue . ',28%,22%)"/>'
+        . '<path d="M0 480 L320 280 L640 440 L960 240 L1280 400 V720 H0Z" fill="hsl(' . $hue . ',30%,16%)"/>'
+        . '<text x="640" y="150" font-size="64" text-anchor="middle" fill="hsl(' . $hue . ',40%,70%)">FULL SIZE</text>'
+        . '</svg>';
+
+    return ['data:image/svg+xml;base64,' . base64_encode($svg), 1280, 720, false];
+}
+
 function wp_get_attachment_image($id, $size = '', $icon = false, $attr = []): string
 {
     // A coloured SVG stands in for a minimap: real dimensions, no files needed.

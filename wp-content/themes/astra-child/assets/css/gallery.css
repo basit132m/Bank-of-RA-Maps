@@ -254,3 +254,176 @@
   .byrm-gal__dl { transition: none; }
   .byrm-gal__tile:hover .byrm-gal__img { transform: none; }
 }
+
+/* ============================================================================
+ * The viewer
+ *
+ * Its own, rather than the map page's: that one builds a thumbnail strip from
+ * a fixed set of images at load, which is wrong for a wall that keeps growing
+ * as you scroll. Scoped under .byrm-glb, which appears in no other stylesheet.
+ * ========================================================================= */
+
+/* Stops the page behind scrolling while the viewer is open. */
+.byrm-glb-open,
+.byrm-glb-open body { overflow: hidden; }
+
+.byrm-glb {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: center;
+  font-family: var(--byrm-font);
+}
+
+.byrm-glb[hidden] { display: none; }
+
+.byrm-glb *,
+.byrm-glb *::before,
+.byrm-glb *::after { box-sizing: border-box; }
+
+.byrm-glb__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 6, 9, .93);
+}
+
+/* ----------------------------------------------------------------- bar ---- */
+
+.byrm-glb__bar {
+  position: relative;
+  z-index: 1;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 14px 18px;
+}
+
+.byrm-glb__count {
+  margin: 0 auto 0 0;
+  font-size: 12.5px;
+  letter-spacing: .08em;
+  color: var(--byrm-chrome-lo);
+  font-variant-numeric: tabular-nums;
+}
+
+.byrm-glb__open {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--byrm-chrome-hi);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.byrm-glb__open:hover,
+.byrm-glb__open:focus-visible { color: var(--byrm-red-bright); }
+
+.byrm-glb__btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: var(--byrm-chrome-hi);
+  background: transparent;
+  border: 1px solid var(--byrm-line);
+  cursor: pointer;
+}
+.byrm-glb__btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
+.byrm-glb__btn:hover,
+.byrm-glb__btn:focus-visible { color: #fff; background: var(--byrm-red); border-color: var(--byrm-red-bright); }
+
+/* --------------------------------------------------------------- stage ---- */
+
+.byrm-glb__stage {
+  position: relative;
+  z-index: 1;
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0 8px 24px;
+  min-height: 0;
+}
+
+.byrm-glb__img {
+  max-width: 100%;
+
+  /* Room for the bar above and the caption below, so a tall image never
+     pushes either off the screen. */
+  max-height: calc(100vh - 160px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border: 1px solid var(--byrm-line);
+  background: var(--byrm-steel-800);
+}
+
+.byrm-glb__cap {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-align: center;
+  color: var(--byrm-chrome-hi);
+}
+
+/* ----------------------------------------------------------------- nav ---- */
+
+.byrm-glb__nav {
+  position: relative;
+  z-index: 1;
+  grid-row: 2;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-inline: 8px;
+  padding: 0;
+  color: var(--byrm-chrome-hi);
+  background: rgba(13, 17, 23, .8);
+  border: 1px solid var(--byrm-line);
+  cursor: pointer;
+}
+.byrm-glb__nav svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
+.byrm-glb__nav--prev { grid-column: 1; }
+.byrm-glb__nav--next { grid-column: 3; }
+.byrm-glb__nav[hidden] { display: none; }
+.byrm-glb__nav:hover,
+.byrm-glb__nav:focus-visible { color: #fff; background: var(--byrm-red); border-color: var(--byrm-red-bright); }
+
+.byrm-glb__btn:focus-visible,
+.byrm-glb__nav:focus-visible,
+.byrm-glb__open:focus-visible { outline: 2px solid var(--byrm-ember); outline-offset: 2px; }
+
+/* -------------------------------------------------------------- narrow ---- */
+
+@media (max-width: 600px) {
+  /* The arrows would leave almost nothing for the picture, so they sit over
+     it at the edges instead of beside it. */
+  .byrm-glb { grid-template-columns: minmax(0, 1fr); }
+
+  .byrm-glb__stage { grid-column: 1; padding-inline: 12px; }
+
+  .byrm-glb__nav {
+    position: absolute;
+    top: 50%;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    transform: translateY(-50%);
+  }
+  .byrm-glb__nav--prev { left: 8px; }
+  .byrm-glb__nav--next { right: 8px; }
+
+  .byrm-glb__img { max-height: calc(100vh - 150px); }
+  .byrm-glb__open { display: none; }
+}

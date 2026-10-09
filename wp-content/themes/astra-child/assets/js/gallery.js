@@ -194,3 +194,191 @@
 		observer.observe(more);
 	}
 }());
+
+/* ====================================================================
+ * The viewer
+ *
+ * The tiles link to the full-size image, so with no script a click still
+ * opens the picture. Here that is intercepted and the dialog opens instead.
+ *
+ * The list of tiles is read from the DOM every time the viewer opens, not
+ * cached at load: infinite scroll keeps adding tiles, and a list captured
+ * once would stop at whatever was on the page when the script ran.
+ * ================================================================= */
+(function viewer() {
+	var lb = document.getElementById('byrm-glb');
+
+	if (!lb) {
+		return;
+	}
+
+	var img = lb.querySelector('[data-glb-img]');
+	var cap = lb.querySelector('[data-glb-cap]');
+	var count = lb.querySelector('[data-glb-count]');
+	var openLink = lb.querySelector('[data-glb-open]');
+	var prev = lb.querySelector('[data-glb-prev]');
+	var next = lb.querySelector('[data-glb-next]');
+	var closers = lb.querySelectorAll('[data-glb-close]');
+
+	if (!img || !prev || !next) {
+		return;
+	}
+
+	var shots = [];
+	var at = -1;
+	var opener = null;
+
+	function collect() {
+		shots = Array.prototype.slice.call(document.querySelectorAll('[data-byrm-gal-shot]'));
+	}
+
+	function show(index) {
+		if (index < 0) { index = shots.length - 1; }
+		if (index >= shots.length) { index = 0; }
+
+		var shot = shots[index];
+
+		if (!shot) {
+			return;
+		}
+
+		at = index;
+
+		var title = shot.getAttribute('data-title') || '';
+		var w = parseInt(shot.getAttribute('data-width'), 10);
+		var h = parseInt(shot.getAttribute('data-height'), 10);
+
+		// Set the dimensions before the source so the browser reserves the
+		// right box and the dialog does not jump as each image arrives.
+		if (isFinite(w) && w > 0) { img.setAttribute('width', String(w)); }
+		if (isFinite(h) && h > 0) { img.setAttribute('height', String(h)); }
+
+		img.setAttribute('src', shot.getAttribute('data-full') || '');
+		img.setAttribute('alt', title);
+
+		if (cap) { cap.textContent = title; }
+
+		if (openLink) {
+			openLink.setAttribute('href', shot.getAttribute('data-map') || '#');
+		}
+
+		if (count) {
+			count.textContent = (index + 1) + ' / ' + shots.length;
+		}
+
+		var only = shots.length < 2;
+		prev.hidden = only;
+		next.hidden = only;
+	}
+
+	function open(index, trigger) {
+		collect();
+
+		if (!shots.length) {
+			return;
+		}
+
+		opener = trigger || null;
+		lb.hidden = false;
+		document.documentElement.classList.add('byrm-glb-open');
+		show(index);
+
+		// Focus lands on Close: the first thing a keyboard user needs, and
+		// it puts focus inside the dialog so the trap below has something
+		// to hold on to.
+		var first = lb.querySelector('[data-glb-close]:not([hidden])');
+
+		if (first && typeof first.focus === 'function') {
+			try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
+		}
+	}
+
+	function close() {
+		lb.hidden = true;
+		document.documentElement.classList.remove('byrm-glb-open');
+		img.removeAttribute('src');
+		at = -1;
+
+		// Put focus back where it came from, not at the top of the page.
+		if (opener && typeof opener.focus === 'function') {
+			try { opener.focus({ preventScroll: true }); } catch (e) { opener.focus(); }
+		}
+
+		opener = null;
+	}
+
+	function step(delta) {
+		if (at > -1) {
+			show(at + delta);
+		}
+	}
+
+	// Delegated, so tiles added by the scroll loader work without rebinding.
+	document.addEventListener('click', function (event) {
+		var shot = event.target.closest ? event.target.closest('[data-byrm-gal-shot]') : null;
+
+		if (!shot) {
+			return;
+		}
+
+		// Leave modified clicks alone — somebody asking for a new tab should
+		// get the image in a new tab.
+		if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+			return;
+		}
+
+		event.preventDefault();
+		collect();
+		open(shots.indexOf(shot), shot);
+	});
+
+	prev.addEventListener('click', function () { step(-1); });
+	next.addEventListener('click', function () { step(1); });
+
+	Array.prototype.forEach.call(closers, function (el) {
+		el.addEventListener('click', close);
+	});
+
+	// Clicking away from the picture closes it. The stage fills the middle
+	// column, so without this only the thin margins either side of it would
+	// work — which reads as a viewer that ignores you.
+	lb.addEventListener('click', function (event) {
+		var t = event.target;
+
+		if (t === lb || t.classList.contains('byrm-glb__backdrop') || t.classList.contains('byrm-glb__stage')) {
+			close();
+		}
+	});
+
+	document.addEventListener('keydown', function (event) {
+		if (lb.hidden) {
+			return;
+		}
+
+		if (event.key === 'Escape') { close(); return; }
+		if (event.key === 'ArrowLeft') { event.preventDefault(); step(-1); return; }
+		if (event.key === 'ArrowRight') { event.preventDefault(); step(1); return; }
+
+		// Keep Tab inside the dialog while it is open.
+		if (event.key === 'Tab') {
+			var able = Array.prototype.slice.call(
+				lb.querySelectorAll('button:not([hidden]), a[href]')
+			).filter(function (el) { return el.offsetParent !== null; });
+
+			if (!able.length) {
+				return;
+			}
+
+			var firstEl = able[0];
+			var lastEl = able[able.length - 1];
+
+			if (event.shiftKey && document.activeElement === firstEl) {
+				event.preventDefault();
+				lastEl.focus();
+			} else if (!event.shiftKey && document.activeElement === lastEl) {
+				event.preventDefault();
+				firstEl.focus();
+			}
+		}
+	});
+}());

@@ -116,6 +116,47 @@ $next_url = add_query_arg( 'gal', $stacked + 1, get_permalink() ) . '#byrm-gal-m
 				<?php endif; ?>
 			</div>
 
+			<?php
+			// The viewer. Printed by PHP rather than built by the script, so it
+			// exists in the document for assistive technology and the script has
+			// only to fill it in. Hidden until something is clicked.
+			?>
+			<div class="byrm-glb" id="byrm-glb" role="dialog" aria-modal="true"
+			     aria-label="<?php esc_attr_e( 'Map image viewer', 'astra-child' ); ?>" hidden>
+
+				<div class="byrm-glb__backdrop"></div>
+
+				<div class="byrm-glb__bar">
+					<p class="byrm-glb__count" data-glb-count></p>
+
+					<a class="byrm-glb__open" data-glb-open href="#" target="_blank" rel="noopener">
+						<?php esc_html_e( 'Open the map page', 'astra-child' ); ?>
+					</a>
+
+					<button type="button" class="byrm-glb__btn" data-glb-close>
+						<span class="byrm-gal__sr"><?php esc_html_e( 'Close', 'astra-child' ); ?></span>
+						<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+							<path d="M6 6l12 12M18 6L6 18"/>
+						</svg>
+					</button>
+				</div>
+
+				<button type="button" class="byrm-glb__nav byrm-glb__nav--prev" data-glb-prev>
+					<span class="byrm-gal__sr"><?php esc_html_e( 'Previous map', 'astra-child' ); ?></span>
+					<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg>
+				</button>
+
+				<figure class="byrm-glb__stage">
+					<img class="byrm-glb__img" data-glb-img alt="">
+					<figcaption class="byrm-glb__cap" data-glb-cap></figcaption>
+				</figure>
+
+				<button type="button" class="byrm-glb__nav byrm-glb__nav--next" data-glb-next>
+					<span class="byrm-gal__sr"><?php esc_html_e( 'Next map', 'astra-child' ); ?></span>
+					<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg>
+				</button>
+			</div>
+
 		<?php else : ?>
 			<div class="byrm-empty">
 				<span class="byrm-empty__mark" aria-hidden="true">

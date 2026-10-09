@@ -122,8 +122,16 @@ function byrm_gallery_query( $page = 1, $stacked = 1 ) {
  * an accessible name and does not read as "link" and nothing else — a picture
  * with no caption is fine, a link with no name is not.
  *
- * Two real links, never nested: the map link IS the tile, and the download
- * sits above it as a sibling. An earlier version stretched a pseudo-element over the tile instead,
+ * Two real links, never nested:
+ *
+ *   The tile links to the full-size image. The script intercepts that and
+ *   opens the viewer instead; with no script, the link still does something
+ *   sensible and opens the picture.
+ *   The icon links to the map's own page, in a new tab, which is where the
+ *   download actually lives.
+ *
+ * The data- attributes are what the viewer reads, so it never has to guess at
+ * a full-size URL from a thumbnail's src. An earlier version stretched a pseudo-element over the tile instead,
  * which silently covered only the caption, because the pseudo resolved against
  * the absolutely-positioned caption rather than the tile. Clicking the picture
  * did nothing, on a page whose whole purpose is clicking pictures.
@@ -137,12 +145,26 @@ function byrm_gallery_tile( $map ) {
 		return;
 	}
 
-	$download = function_exists( 'byrm_map_download_url' ) ? byrm_map_download_url( $map->ID ) : '';
-	$link     = get_permalink( $map );
-	$title    = get_the_title( $map );
+	$link  = get_permalink( $map );
+	$title = get_the_title( $map );
+
+	// The original upload, for the viewer. Falling back to the tile's own link
+	// means a missing full size never produces a dead anchor.
+	$full     = wp_get_attachment_image_src( $thumb, 'full' );
+	$full_url = ( is_array( $full ) && ! empty( $full[0] ) ) ? $full[0] : $link;
+	$full_w   = ( is_array( $full ) && ! empty( $full[1] ) ) ? (int) $full[1] : 0;
+	$full_h   = ( is_array( $full ) && ! empty( $full[2] ) ) ? (int) $full[2] : 0;
 	?>
 	<article class="byrm-gal__tile">
-		<a class="byrm-gal__link" href="<?php echo esc_url( $link ); ?>">
+		<a
+			class="byrm-gal__link"
+			href="<?php echo esc_url( $full_url ); ?>"
+			data-byrm-gal-shot
+			data-full="<?php echo esc_url( $full_url ); ?>"
+			data-width="<?php echo esc_attr( (string) $full_w ); ?>"
+			data-height="<?php echo esc_attr( (string) $full_h ); ?>"
+			data-map="<?php echo esc_url( $link ); ?>"
+			data-title="<?php echo esc_attr( $title ); ?>">
 			<?php
 			// The alt carries the map's name: it is the link's accessible name,
 			// and the only thing standing in for the caption that used to be here.
@@ -161,26 +183,25 @@ function byrm_gallery_tile( $map ) {
 			?>
 		</a>
 
-		<?php if ( $download ) : ?>
-			<a
-				class="byrm-gal__dl"
-				href="<?php echo esc_url( $download ); ?>"
-				target="_blank"
-				rel="noopener"
-				aria-label="
-				<?php
-				printf(
-					/* translators: %s: map title */
-					esc_attr__( 'Download %s (opens in a new tab)', 'astra-child' ),
-					esc_attr( $title )
-				);
-				?>
-				">
-				<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-					<path d="M12 4v11M7 11l5 5 5-5M5 20h14" stroke-linecap="round" stroke-linejoin="round"/>
-				</svg>
-			</a>
-		<?php endif; ?>
+		<?php // The map's own page, where the specifications and the real download button are. ?>
+		<a
+			class="byrm-gal__dl"
+			href="<?php echo esc_url( $link ); ?>"
+			target="_blank"
+			rel="noopener"
+			aria-label="
+			<?php
+			printf(
+				/* translators: %s: map title */
+				esc_attr__( 'Download %s — opens the map page in a new tab', 'astra-child' ),
+				esc_attr( $title )
+			);
+			?>
+			">
+			<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+				<path d="M12 4v11M7 11l5 5 5-5M5 20h14" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg>
+		</a>
 	</article>
 	<?php
 }
