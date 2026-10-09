@@ -55,7 +55,9 @@ while ( have_posts() ) :
 
 	$mods_url = post_type_exists( 'mod' ) ? get_post_type_archive_link( 'mod' ) : home_url( '/mods/' );
 	$banner   = function_exists( 'byrm_map_banner_style' ) ? byrm_map_banner_style() : '';
-	$related  = function_exists( 'byrm_related_mod_posts' ) ? byrm_related_mod_posts( $post_id ) : array();
+	// Four, matching the map page: they share .byrm-related__grid, which is a
+	// four-column grid, so three would leave an empty cell at the end.
+	$related  = function_exists( 'byrm_related_mod_posts' ) ? byrm_related_mod_posts( $post_id, 4 ) : array();
 	?>
 
 	<div id="byrm-content" class="byrm-map byrm-mod">

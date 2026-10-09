@@ -109,7 +109,9 @@ function byrm_related_map_posts( $post_id, $players = '', $limit = 3 ) {
  * @param string|int $players Its player count.
  */
 function byrm_related_maps( $post_id, $players = '' ) {
-	$related = byrm_related_map_posts( $post_id, $players );
+	// Four, not the getter's default of three: the grid below fits four across
+	// at full width, so three left a gap at the end of the row.
+	$related = byrm_related_map_posts( $post_id, $players, 4 );
 
 	if ( ! $related ) {
 		return;

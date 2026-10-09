@@ -183,13 +183,26 @@ function get_the_terms($id, string $tax)
 }
 function get_term_link($term): string { return '/map-tag/' . $term->slug; }
 
+// Honours posts_per_page and post__not_in, so a change to how many related
+// maps are asked for actually shows up here. Returning a fixed three made this
+// stub blind to the limit entirely.
 function get_posts(array $args = []): array
 {
-    return [
-        (object) ['ID' => 8, 'title' => 'Coral Gauntlet', 'slug' => 'coral-gauntlet'],
-        (object) ['ID' => 9, 'title' => 'Baku Oil Fields', 'slug' => 'baku-oil-fields'],
+    $all = [
+        (object) ['ID' => 8,  'title' => 'Coral Gauntlet', 'slug' => 'coral-gauntlet'],
+        (object) ['ID' => 9,  'title' => 'Baku Oil Fields', 'slug' => 'baku-oil-fields'],
         (object) ['ID' => 10, 'title' => 'Siberian Crossroads', 'slug' => 'siberian-crossroads'],
+        (object) ['ID' => 11, 'title' => 'Dead Man\'s Gulch', 'slug' => 'dead-mans-gulch'],
+        (object) ['ID' => 12, 'title' => 'Arctic Shelf', 'slug' => 'arctic-shelf'],
+        (object) ['ID' => 13, 'title' => 'Tiber Delta', 'slug' => 'tiber-delta'],
     ];
+
+    $skip = array_map('intval', (array) ($args['post__not_in'] ?? []));
+    $all  = array_values(array_filter($all, static fn($m) => !in_array($m->ID, $skip, true)));
+
+    $per = (int) ($args['posts_per_page'] ?? 3);
+
+    return $per > 0 ? array_slice($all, 0, $per) : $all;
 }
 
 // ------------------------------------------------------------- template ----
