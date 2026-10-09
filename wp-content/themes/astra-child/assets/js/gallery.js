@@ -249,11 +249,78 @@
 		'</button>'
 	].join('');
 
+	/**
+	 * The viewer's own stylesheet, used only when gallery.css did not bring it.
+	 *
+	 * A minifier that choked on the file, a combine-and-cache plugin holding a
+	 * copy from before the viewer existed, a stylesheet that never got saved —
+	 * each leaves the dialog in the page with nothing positioning it, so it
+	 * lands in the flow under the footer at the full size of the image. That is
+	 * not a viewer, so the script carries a fallback rather than trusting a
+	 * second file to arrive intact.
+	 *
+	 * Deliberately the same declarations as the .byrm-glb block in gallery.css.
+	 * When that block is present this never runs, so the two cannot disagree on
+	 * screen; if the design changes, change both.
+	 */
+	var CSS = [
+		'.byrm-glb-open,.byrm-glb-open body{overflow:hidden}',
+		'.byrm-glb{position:fixed;inset:0;z-index:9999;display:grid;',
+		'grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:auto minmax(0,1fr);',
+		'align-items:center;font-family:var(--byrm-font,system-ui,sans-serif)}',
+		'.byrm-glb[hidden]{display:none}',
+		'.byrm-glb *,.byrm-glb *::before,.byrm-glb *::after{box-sizing:border-box}',
+		'.byrm-glb__backdrop{position:absolute;inset:0;background:rgba(4,6,9,.93)}',
+		'.byrm-glb__bar{position:relative;z-index:1;grid-column:1/-1;display:flex;align-items:center;',
+		'justify-content:flex-end;gap:16px;padding:14px 18px}',
+		'.byrm-glb__count{margin:0 auto 0 0;font-size:12.5px;letter-spacing:.08em;',
+		'color:var(--byrm-chrome-lo,#8b949e);font-variant-numeric:tabular-nums}',
+		'.byrm-glb__open{font-size:13px;font-weight:700;letter-spacing:.04em;',
+		'color:var(--byrm-chrome-hi,#e6edf3);text-decoration:underline;text-underline-offset:3px}',
+		'.byrm-glb__open:hover,.byrm-glb__open:focus-visible{color:var(--byrm-red-bright,#ff4747)}',
+		'.byrm-glb__btn{display:grid;place-items:center;width:40px;height:40px;padding:0;',
+		'color:var(--byrm-chrome-hi,#e6edf3);background:transparent;',
+		'border:1px solid var(--byrm-line,#30363d);cursor:pointer}',
+		'.byrm-glb__btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}',
+		'.byrm-glb__btn:hover,.byrm-glb__btn:focus-visible{color:#fff;background:var(--byrm-red,#e01f1f);',
+		'border-color:var(--byrm-red-bright,#ff4747)}',
+		'.byrm-glb__stage{position:relative;z-index:1;grid-column:2;grid-row:2;display:flex;',
+		'flex-direction:column;align-items:center;justify-content:center;gap:12px;margin:0;',
+		'padding:0 8px 24px;min-height:0}',
+		'.byrm-glb__img{max-width:100%;max-height:calc(100vh - 160px);width:auto;height:auto;',
+		'object-fit:contain;border:1px solid var(--byrm-line,#30363d);',
+		'background:var(--byrm-steel-800,#0d1117)}',
+		'.byrm-glb__cap{margin:0;font-size:14px;font-weight:700;letter-spacing:.02em;',
+		'text-align:center;color:var(--byrm-chrome-hi,#e6edf3)}',
+		'.byrm-glb__nav{position:relative;z-index:1;grid-row:2;display:grid;place-items:center;',
+		'width:54px;height:54px;margin-inline:8px;padding:0;color:var(--byrm-chrome-hi,#e6edf3);',
+		'background:rgba(13,17,23,.8);border:1px solid var(--byrm-line,#30363d);cursor:pointer}',
+		'.byrm-glb__nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2}',
+		'.byrm-glb__nav--prev{grid-column:1}.byrm-glb__nav--next{grid-column:3}',
+		'.byrm-glb__nav[hidden]{display:none}',
+		'.byrm-glb__nav:hover,.byrm-glb__nav:focus-visible{color:#fff;background:var(--byrm-red,#e01f1f);',
+		'border-color:var(--byrm-red-bright,#ff4747)}',
+		'.byrm-glb__btn:focus-visible,.byrm-glb__nav:focus-visible,.byrm-glb__open:focus-visible',
+		'{outline:2px solid var(--byrm-ember,#f0a020);outline-offset:2px}',
+		// The visually-hidden label, in case gallery.css is missing entirely.
+		'.byrm-glb .byrm-gal__sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;',
+		'overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}',
+		'@media (max-width:600px){',
+		'.byrm-glb{grid-template-columns:minmax(0,1fr)}',
+		'.byrm-glb__stage{grid-column:1;padding-inline:12px}',
+		'.byrm-glb__nav{position:absolute;top:50%;width:44px;height:44px;margin:0;',
+		'transform:translateY(-50%)}',
+		'.byrm-glb__nav--prev{left:8px}.byrm-glb__nav--next{right:8px}',
+		'.byrm-glb__img{max-height:calc(100vh - 150px)}',
+		'.byrm-glb__open{display:none}}'
+	].join('');
+
 	var lb = null;
 	var img, cap, count, openLink, prev, next;
 	var shots = [];
 	var at = -1;
 	var opener = null;
+	var styled = false;
 
 	function collect() {
 		shots = Array.prototype.slice.call(document.querySelectorAll('[data-byrm-gal-shot]'));
@@ -320,6 +387,30 @@
 		return true;
 	}
 
+	/**
+	 * Whether the stylesheet got here. Checked once, with the dialog visible
+	 * so the value is the real used one, and the fallback injected if not.
+	 *
+	 * position is the right thing to test: it is what the whole overlay rests
+	 * on, and nothing else on the page sets it for this element.
+	 */
+	function dressed() {
+		if (styled) {
+			return;
+		}
+
+		styled = true;
+
+		if (window.getComputedStyle(lb).position === 'fixed') {
+			return;
+		}
+
+		var tag = document.createElement('style');
+		tag.id = 'byrm-glb-css';
+		tag.appendChild(document.createTextNode(CSS));
+		document.head.appendChild(tag);
+	}
+
 	function show(index) {
 		if (index < 0) { index = shots.length - 1; }
 		if (index >= shots.length) { index = 0; }
@@ -368,6 +459,7 @@
 
 		opener = trigger || null;
 		lb.hidden = false;
+		dressed();
 		document.documentElement.classList.add('byrm-glb-open');
 		show(index);
 
