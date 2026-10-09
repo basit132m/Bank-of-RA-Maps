@@ -249,6 +249,10 @@
 		'</button>'
 	].join('');
 
+	// The site icon, spun while a full-size picture is on its way. Overridable
+	// without touching this file: put a URL in data-spinner on the grid.
+	var SPINNER = 'https://www.bankofyrmaps.com/wp-content/uploads/2026/09/cropped-Ban-of-YR-Maps-Logo.webp';
+
 	/**
 	 * The viewer's own stylesheet, used only when gallery.css did not bring it.
 	 *
@@ -305,8 +309,24 @@
 		// The visually-hidden label, in case gallery.css is missing entirely.
 		'.byrm-glb .byrm-gal__sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;',
 		'overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}',
+		'.byrm-glb__wait{position:absolute;inset:0;z-index:2;display:grid;place-items:center;',
+		'opacity:0;pointer-events:none;transition:opacity .2s linear}',
+		'.byrm-glb[data-wait] .byrm-glb__wait{opacity:1}',
+		'.byrm-glb[data-loading] .byrm-glb__img{visibility:hidden}',
+		'.byrm-glb__spin{width:64px;height:64px;object-fit:contain;',
+		'animation:byrm-glb-spin 1.1s linear infinite}',
+		'.byrm-glb__wait--ring .byrm-glb__spin{display:none}',
+		'.byrm-glb__wait--ring::after{content:"";width:48px;height:48px;border-radius:50%;',
+		'border:3px solid var(--byrm-line,#30363d);border-top-color:var(--byrm-red-bright,#ff4747);',
+		'animation:byrm-glb-spin 1s linear infinite}',
+		'@keyframes byrm-glb-spin{to{transform:rotate(360deg)}}',
+		'@keyframes byrm-glb-pulse{0%,100%{opacity:.35}50%{opacity:1}}',
+		'@media (prefers-reduced-motion:reduce){',
+		'.byrm-glb__spin,.byrm-glb__wait--ring::after',
+		'{animation:byrm-glb-pulse 1.4s ease-in-out infinite}}',
 		'@media (max-width:600px){',
 		'.byrm-glb{grid-template-columns:minmax(0,1fr)}',
+		'.byrm-glb__spin{width:52px;height:52px}',
 		'.byrm-glb__stage{grid-column:1;padding-inline:12px}',
 		'.byrm-glb__nav{position:absolute;top:50%;width:44px;height:44px;margin:0;',
 		'transform:translateY(-50%)}',
@@ -321,6 +341,7 @@
 	var at = -1;
 	var opener = null;
 	var styled = false;
+	var waitTimer = null;
 
 	function collect() {
 		shots = Array.prototype.slice.call(document.querySelectorAll('[data-byrm-gal-shot]'));
@@ -365,6 +386,36 @@
 			lb = null;
 			return false;
 		}
+
+		// The spinner is the script's own: the template never prints one, and
+		// a viewer that only exists with JavaScript has no use for a no-JS
+		// fallback here.
+		if (!lb.querySelector('.byrm-glb__wait')) {
+			var wait = document.createElement('div');
+			wait.className = 'byrm-glb__wait';
+			wait.setAttribute('aria-hidden', 'true');
+
+			var spin = document.createElement('img');
+			spin.className = 'byrm-glb__spin';
+			spin.alt = '';
+
+			// A renamed or moved logo would otherwise leave a blank middle
+			// with nothing to say the picture is coming.
+			spin.addEventListener('error', function () {
+				wait.className = 'byrm-glb__wait byrm-glb__wait--ring';
+			});
+
+			var grid = document.querySelector('[data-byrm-gallery]');
+			spin.src = (grid && grid.getAttribute('data-spinner')) || SPINNER;
+
+			wait.appendChild(spin);
+			lb.appendChild(wait);
+		}
+
+		// One pair for the life of the page. Changing src aborts the request
+		// in flight, so only the current picture ever reports back.
+		img.addEventListener('load', function () { waiting(false); });
+		img.addEventListener('error', function () { waiting(false); });
 
 		prev.addEventListener('click', function () { step(-1); });
 		next.addEventListener('click', function () { step(1); });
@@ -411,6 +462,49 @@
 		document.head.appendChild(tag);
 	}
 
+	/**
+	 * Spinner on or off, and the same thing said to assistive technology.
+	 *
+	 * Two states, not one. The picture is hidden the moment a new one is asked
+	 * for, because leaving the last map up while the next downloads reads as
+	 * the arrow key having done nothing. The spinner is held back, because one
+	 * already in the cache arrives in a few milliseconds and a spinner that
+	 * flashes for a frame on every step is worse than no spinner at all.
+	 *
+	 * The hold is a timer rather than a CSS transition-delay: the dialog goes
+	 * from display:none to visible in the same style recalculation that sets
+	 * this, and a transition does not run on an element's first frame after a
+	 * display change — the delay would be skipped and the spinner would appear
+	 * at once every time.
+	 */
+	function waiting(on) {
+		if (waitTimer) {
+			clearTimeout(waitTimer);
+			waitTimer = null;
+		}
+
+		if (!on) {
+			lb.removeAttribute('data-loading');
+			lb.removeAttribute('data-wait');
+			lb.removeAttribute('aria-busy');
+
+			// Off the placeholder sizing. Left on, an explicit width plus
+			// max-height would letterbox a tall picture instead of shrinking
+			// it.
+			img.style.aspectRatio = '';
+			img.style.width = '';
+			return;
+		}
+
+		lb.setAttribute('data-loading', '');
+		lb.setAttribute('aria-busy', 'true');
+
+		waitTimer = setTimeout(function () {
+			waitTimer = null;
+			lb.setAttribute('data-wait', '');
+		}, 200);
+	}
+
 	function show(index) {
 		if (index < 0) { index = shots.length - 1; }
 		if (index >= shots.length) { index = 0; }
@@ -427,13 +521,31 @@
 		var w = parseInt(shot.getAttribute('data-width'), 10);
 		var h = parseInt(shot.getAttribute('data-height'), 10);
 
-		// Set the dimensions before the source so the browser reserves the
-		// right box and the dialog does not jump as each image arrives.
 		if (isFinite(w) && w > 0) { img.setAttribute('width', String(w)); }
 		if (isFinite(h) && h > 0) { img.setAttribute('height', String(h)); }
 
+		// Hold the box the picture is going to occupy. The width and height
+		// attributes do not do this on their own: the stylesheet's width:auto
+		// overrides them as a sizing hint, so an image still downloading
+		// measures nothing and the caption sits in the middle of the screen
+		// until it lands, then drops. These two reproduce exactly what the
+		// loaded image resolves to, and waiting() takes them off again so the
+		// real intrinsic size governs once it is here.
+		if (isFinite(w) && w > 0 && isFinite(h) && h > 0) {
+			img.style.aspectRatio = w + ' / ' + h;
+			img.style.width = 'min(100%, ' + w + 'px)';
+		}
+
+		waiting(true);
 		img.setAttribute('src', shot.getAttribute('data-full') || '');
 		img.setAttribute('alt', title);
+
+		// Already decoded: depending on the browser, no load event is coming
+		// for it at all. The held-back spinner covers this too, but clearing
+		// here means the picture is never hidden for even a frame.
+		if (img.complete && img.naturalWidth > 0) {
+			waiting(false);
+		}
 
 		if (cap) { cap.textContent = title; }
 
@@ -474,6 +586,7 @@
 	}
 
 	function close() {
+		waiting(false);
 		lb.hidden = true;
 		document.documentElement.classList.remove('byrm-glb-open');
 		img.removeAttribute('src');
