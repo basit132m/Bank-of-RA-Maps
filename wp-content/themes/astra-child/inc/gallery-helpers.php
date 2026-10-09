@@ -117,9 +117,13 @@ function byrm_gallery_query( $page = 1, $stacked = 1 ) {
 /**
  * One tile.
  *
- * Renders. Two real links, never nested: the map link IS the tile — image,
- * veil and caption all live inside it — and the download sits above it as a
- * sibling. An earlier version stretched a pseudo-element over the tile instead,
+ * Renders. Nothing but the picture: no title, no player count, no theater.
+ * The map's name goes in the image's alt text instead, so the link still has
+ * an accessible name and does not read as "link" and nothing else — a picture
+ * with no caption is fine, a link with no name is not.
+ *
+ * Two real links, never nested: the map link IS the tile, and the download
+ * sits above it as a sibling. An earlier version stretched a pseudo-element over the tile instead,
  * which silently covered only the caption, because the pseudo resolved against
  * the absolutely-positioned caption rather than the tile. Clicking the picture
  * did nothing, on a page whose whole purpose is clicking pictures.
@@ -133,9 +137,6 @@ function byrm_gallery_tile( $map ) {
 		return;
 	}
 
-	$players  = function_exists( 'byrm_map_meta' ) ? byrm_map_meta( 'players', $map->ID ) : '';
-	$theaters = get_the_terms( $map->ID, 'map_theater' );
-	$theater  = ( $theaters && ! is_wp_error( $theaters ) ) ? $theaters[0]->name : '';
 	$download = function_exists( 'byrm_map_download_url' ) ? byrm_map_download_url( $map->ID ) : '';
 	$link     = get_permalink( $map );
 	$title    = get_the_title( $map );
@@ -143,45 +144,21 @@ function byrm_gallery_tile( $map ) {
 	<article class="byrm-gal__tile">
 		<a class="byrm-gal__link" href="<?php echo esc_url( $link ); ?>">
 			<?php
+			// The alt carries the map's name: it is the link's accessible name,
+			// and the only thing standing in for the caption that used to be here.
 			echo wp_get_attachment_image(
 				$thumb,
 				'medium_large',
 				false,
 				array(
 					'class'    => 'byrm-gal__img',
-					'alt'      => '',
+					'alt'      => $title,
 					'loading'  => 'lazy',
 					'decoding' => 'async',
 					'sizes'    => '(max-width: 600px) 100vw, (max-width: 1100px) 50vw, 33vw',
 				)
 			);
 			?>
-
-			<span class="byrm-gal__veil" aria-hidden="true"></span>
-
-			<span class="byrm-gal__cap">
-				<h2 class="byrm-gal__name"><?php echo esc_html( $title ); ?></h2>
-
-				<?php if ( $players || $theater ) : ?>
-					<span class="byrm-gal__meta">
-						<?php if ( $players ) : ?>
-							<?php
-							printf(
-								/* translators: %s: number of players */
-								esc_html__( '%s players', 'astra-child' ),
-								esc_html( $players )
-							);
-							?>
-						<?php endif; ?>
-						<?php if ( $players && $theater ) : ?>
-							<span aria-hidden="true">&middot;</span>
-						<?php endif; ?>
-						<?php if ( $theater ) : ?>
-							<?php echo esc_html( $theater ); ?>
-						<?php endif; ?>
-					</span>
-				<?php endif; ?>
-			</span>
 		</a>
 
 		<?php if ( $download ) : ?>
