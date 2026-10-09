@@ -440,10 +440,14 @@
 
 	/**
 	 * Whether the stylesheet got here. Checked once, with the dialog visible
-	 * so the value is the real used one, and the fallback injected if not.
+	 * so the values are the real used ones, and the fallback injected if not.
 	 *
-	 * position is the right thing to test: it is what the whole overlay rests
-	 * on, and nothing else on the page sets it for this element.
+	 * position is the right thing to test for both: it is what the overlay and
+	 * the spinner layer each rest on, and nothing else on the page sets it for
+	 * these elements. The spinner is checked separately from the dialog
+	 * because a stylesheet can be one update behind rather than absent — the
+	 * viewer block present, the loading block not — and that renders the logo
+	 * full size and motionless in the middle of the picture.
 	 */
 	function dressed() {
 		if (styled) {
@@ -452,7 +456,10 @@
 
 		styled = true;
 
-		if (window.getComputedStyle(lb).position === 'fixed') {
+		var wait = lb.querySelector('.byrm-glb__wait');
+
+		if (window.getComputedStyle(lb).position === 'fixed'
+			&& wait && window.getComputedStyle(wait).position === 'absolute') {
 			return;
 		}
 
