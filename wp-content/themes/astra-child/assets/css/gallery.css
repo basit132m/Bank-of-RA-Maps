@@ -114,9 +114,12 @@
 
 /* ---------------------------------------------------------------- grid ---- */
 
+/* Three across, fixed — not auto-fill. The wall reads as a deliberate grid
+   rather than reflowing to four or five on a wide screen, and a bigger tile
+   means the minimap is actually legible. */
 .byrm-gal__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -230,6 +233,10 @@
 }
 
 /* -------------------------------------------------------------- narrow ---- */
+
+@media (max-width: 900px) {
+  .byrm-gal__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+}
 
 @media (max-width: 600px) {
   .byrm-gal__grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
