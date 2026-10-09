@@ -5,10 +5,11 @@
  * WordPress uses this automatically for a Page whose slug is "gallery";
  * byrm_gallery_template() routes "map-gallery" here as well.
  *
- * Nothing but minimaps. The title and player count sit on the image rather than
- * under it, so the grid stays a wall of pictures, and they are always visible
- * rather than appearing on hover — a caption nobody can reach with a keyboard
- * or a touchscreen is not a caption.
+ * Nothing but minimaps: no titles, no specifications, nothing under the picture.
+ * The map's name lives in each image's alt text, so the wall stays a wall while
+ * screen readers still get a name for every tile. Clicking a picture opens it
+ * full size in the viewer at the bottom of this template; the download icon
+ * goes to that map's own page.
  *
  * @package Astra_Child
  */
