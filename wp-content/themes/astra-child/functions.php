@@ -528,12 +528,12 @@ add_filter( 'byrm_community_config', 'byrm_community_settings' );
  * @return array<string, string>
  */
 function byrm_about_settings( $config ) {
-	$config['maintainer']    = '';   // e.g. Basit
-	$config['since']         = '';   // e.g. 2019
-	$config['contact_email'] = '';   // e.g. hello@bankofyrmaps.com
+	$config['maintainer']    = 'Bank of YR Maps';
+	$config['since']         = '2026';
+	$config['contact_email'] = 'bankofyrmaps@gmail.com';
 	$config['discord_url']   = '';   // e.g. https://discord.gg/xxxxxxx
 	$config['forum_url']     = '';   // e.g. https://forums.cncnet.org/
-	$config['file_host']     = '';   // e.g. Datadock
+	$config['file_host']     = 'Partner | DataDock Host';
 
 	return $config;
 }
